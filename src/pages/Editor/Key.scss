@@ -72,6 +72,14 @@
   }
 }
 
+.keyHeader-tags {
+  display: flex;
+  gap: 8px;
+  margin-left: 16px;
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
 .keyHeader-controls {
   margin-top: 5px;
   margin-left: auto;

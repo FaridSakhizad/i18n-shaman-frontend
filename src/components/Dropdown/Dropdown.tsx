@@ -98,7 +98,10 @@ export default function Dropdown(props: IProps) {
       left?: string;
       right?: string;
       bottom?: string;
-    } = {};
+    } = {
+      top: '-9999px',
+      left: '-9999px',
+    };
 
     if (position.left) {
       result.left = `${position.left}px`;
@@ -157,12 +160,12 @@ export default function Dropdown(props: IProps) {
   }, []);
 
   const attachWindowMutateListeners = () => {
-    window.addEventListener('resize', calculatePosition)
-  }
+    window.addEventListener('resize', calculatePosition);
+  };
 
   const detachWindowMutateListeners = () => {
     window.removeEventListener('resize', calculatePosition);
-  }
+  };
 
   useEffect(() => {
     attachWindowMutateListeners();

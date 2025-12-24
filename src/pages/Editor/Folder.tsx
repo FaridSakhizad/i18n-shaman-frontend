@@ -9,10 +9,10 @@ import { ROOT } from 'constants/app';
 
 import {
   EntityType,
-  IKey,
+  IKey, IKeyTag,
   IKeyValue,
   INavigationData,
-  IProjectLanguage,
+  IProjectLanguage, ITag,
 } from 'interfaces';
 
 // eslint-disable-next-line import/no-cycle
@@ -33,7 +33,9 @@ interface IProps {
   path: string;
   pathCache: string;
   iteration?: number;
-  navigationData?: INavigationData | {}
+  navigationData?: INavigationData | {};
+  tags: IKeyTag[];
+  projectTags: ITag[];
 }
 
 export default function FolderComponent({
@@ -48,6 +50,8 @@ export default function FolderComponent({
   pathCache,
   iteration = 0,
   navigationData = {},
+  tags,
+  projectTags = [],
 }: IProps) {
   const { projectId: currentProjectId = '' } = useParams();
 
@@ -202,6 +206,7 @@ export default function FolderComponent({
               path={`${path !== ROOT ? `${path}/` : ''}${label}`}
               pathCache={`${pathCache}/${id}`}
               navigationData={navigationData}
+              projectTags={projectTags}
             />
           )}
         </div>

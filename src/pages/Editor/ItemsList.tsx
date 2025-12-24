@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { DEFAULT_ITEMS_PER_PAGE, PROJECT_ITEMS_MAX_DEPTH } from 'constants/app';
-import { IKey, IKeyValue, IProjectLanguage, INavigationData } from 'interfaces';
+import { IKey, IKeyValue, IProjectLanguage, INavigationData, ITag } from 'interfaces';
 import clsx from 'clsx';
 
 import Key from './Key';
@@ -24,6 +24,7 @@ interface IProps {
   totalCount?: number;
   itemsPerPage?: number;
   navigationData?: INavigationData | {};
+  projectTags: ITag[]
 }
 
 const TOTAL_PAGES = 10;
@@ -41,6 +42,7 @@ export default function ItemsList({
   totalCount = 0,
   itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
   navigationData = {},
+  projectTags = [],
 }: IProps) {
   if (iteration > PROJECT_ITEMS_MAX_DEPTH) {
     return null;
@@ -74,6 +76,8 @@ export default function ItemsList({
                 description={key.description}
                 path={path}
                 pathCache={pathCache}
+                tags={key.tags}
+                projectTags={projectTags}
               />
             </Fragment>
           );
@@ -94,6 +98,8 @@ export default function ItemsList({
                 path={path}
                 pathCache={pathCache}
                 navigationData={navigationData}
+                tags={key.tags}
+                projectTags={projectTags}
               />
             </Fragment>
           );
@@ -114,6 +120,8 @@ export default function ItemsList({
                 path={path}
                 pathCache={pathCache}
                 navigationData={navigationData}
+                tags={key.tags}
+                projectTags={projectTags}
               />
             </Fragment>
           );

@@ -1,0 +1,225 @@
+.tagsEditor {}
+
+.tagsEditor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tagsEditor-listItem {
+    display: flex;
+    justify-content: flex-start;
+
+    .tag {
+        margin: 6px 0;
+    }
+}
+
+.tagsEditor-listItemControls {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    align-items: center;
+}
+
+.tagsEditor-listItemControl {
+    display: block;
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #faf9fb;
+    background-color: rgba(205, 207, 212, 0.7);
+
+    &:before {
+        background-color: white;
+    }
+}
+
+.tagsEditor-listItemControl_edit {
+    &:hover {
+        background-color: #388ff3;
+    }
+
+    &:before {
+        content: '';
+        display: block;
+        width: 11px;
+        height: 12px;
+        mask: url("../../assets/images/icon--pen.svg") right center no-repeat;
+        margin: 0 auto;
+    }
+}
+.tagsEditor-listItemControl_delete {
+    &:hover {
+        background-color: #e62e2e;
+    }
+
+    &:before {
+        content: '';
+        display: block;
+        width: 11px;
+        height: 12px;
+        mask: url("../../assets/images/icon--dumpster.svg") right center no-repeat;
+        margin: 0 auto 1px auto;
+    }
+}
+
+.tagsEditor-listItemControlButton {
+    height: 23px;
+    padding: 4px 12px 2px 12px;
+    font-size: 13px;
+
+    &.secondary {
+        padding: 3px 12px 1px 12px;
+    }
+}
+
+.tagsEdit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.tagsEdit-input {
+    margin-right: 6px;
+    flex: 1 1 0;
+}
+
+.tagColorIcon {
+    display: block;
+    background-color: var(--tag-background-color);
+    border: 1px solid var(--tag-border-color);
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    z-index: 20;
+    cursor: pointer;
+}
+
+.tagsEdit-colorPicker {
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background-image: conic-gradient( #ff0000 0%, #ffff00 20%, #00ff00 40%, #0000ff 60%, #ff00ff 80%, #ff0000 100%);
+    overflow: hidden;
+    filter: saturate(0.8);
+    z-index: 20;
+    cursor: pointer;
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 9px;
+        height: 9px;
+        background-color: #fff;
+        border-radius: 50%;
+    }
+}
+
+.tagsEdit-cancelButton {
+    width: 41px;
+    height: 31px;
+    position: relative;
+
+    &:before,
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        width: 1px;
+        height: 1px;
+        background-color: #404040;
+        scale: 1.7 12.5;
+    }
+
+    &:before {
+        rotate: 45deg;
+    }
+
+    &:after {
+        rotate: -45deg;
+    }
+}
+
+.tagsEdit-saveButton {
+    width: 41px;
+    height: 31px;
+
+    &:after {
+        content: '';
+        display: block;
+        margin: auto;
+        width: 13px;
+        height: 13px;
+        background-color: white;
+        mask: url("../../assets/images/icon--checkbox-checkmark.svg") center left no-repeat;
+        mask-size: contain;
+    }
+}
+
+.tagsEditor-colorPicker {
+    width: 300px;
+    min-width: 300px;
+
+    .dialogModal-button {
+        min-width: 81px;
+    }
+}
+
+.tagsEditor-tagRow {
+    display: flex;
+    margin-bottom: 24px;
+}
+
+.tagsEditor-moreColorsButton {
+    position: relative;
+    overflow: hidden;
+
+    &.button {
+        box-shadow: none;
+        font-size: 12px;
+        line-height: 13px;
+        padding: 4px 10px 1px 10px;
+        margin-left: auto;
+    }
+}
+
+.tagsEditor-moreColorsInput {
+    cursor: pointer;
+    position: absolute;
+    bottom: -10px;
+    left: -10px;
+    scale: 3;
+    transform-origin: left bottom;
+    margin: auto;
+    opacity: 0;
+}
+
+.tagsEditor-colorSwatch {
+    display: grid;
+    grid-template-columns: repeat(8, 23px);
+    gap: 7px;
+}
+
+.tagsEditor-color {
+    display: block;
+    width: 23px;
+    height: 23px;
+    border-radius: 10px;
+    background-color: var(--tag-background-color);
+    border: 1px solid var(--tag-border-color);
+    cursor: pointer;
+}
+

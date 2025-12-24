@@ -278,7 +278,7 @@ input:-webkit-autofill:focus {
     border: 1px solid rgb(189, 189, 187);
     background-image: linear-gradient(0deg, rgb(198,197,196) 0%, rgb(223,223,222) 55%, rgb(248,248,248) 100%);
     box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.15);
-    padding: 7px 12px 5px 12px;
+    padding: 6px 12px 4px 12px;
 
     &:hover {
       border-color: rgb(189, 189, 187);
@@ -433,6 +433,239 @@ input:-webkit-autofill:focus {
   &:has(.buttonUploadInput) {
     position: relative;
     overflow: hidden;
+  }
+}
+
+.tag {
+  display: inline-flex;
+  gap: 8px;
+  text-decoration: none;
+  font-size: 11px;
+  line-height: 13px;
+  border-radius: 65536px;
+  padding: 3px 8px 2px 8px;
+  text-align: center;
+  font-family: var(--main-font-family);
+  color: white;
+
+  &:has(.tag-name) {
+    padding: 0 8px 0 8px;
+  }
+
+  --tag-background-color: #9e9ea3;
+  --tag-border-color: #9e9ea3;
+
+  background-color: var(--tag-background-color);
+  border: 1px solid var(--tag-border-color);
+  height: 19px;
+}
+
+.tag,
+.tagColorIcon,
+.tagsEditor-color {
+  &.custom {
+    --tag-background-color: var(--custom-color);
+    --tag-border-color: var(--custom-color);
+  }
+
+  &.color1 {
+    --tag-background-color: #f1756e;
+    --tag-border-color: #f1756e;
+  }
+
+  &.color2 {
+    --tag-background-color: #eb5b55;
+    --tag-border-color: #eb5b55;
+  }
+
+  &.color3 {
+    --tag-background-color: #e33e39;
+    --tag-border-color: #e33e39;
+  }
+
+
+  &.color4 {
+    --tag-background-color: #f3b565;
+    --tag-border-color: #ef9d2c;
+  }
+
+  &.color5 {
+    --tag-background-color: #ed9b4d;
+    --tag-border-color: #e88121;
+  }
+
+  &.color6 {
+    --tag-background-color: #e67b33;
+    --tag-border-color: #df6015;
+  }
+
+
+  &.color7 {
+    --tag-background-color: #f5d96c;
+    --tag-border-color: #f1d040;
+  }
+
+  &.color8 {
+    --tag-background-color: #f1c953;
+    --tag-border-color: #ebbc30;
+  }
+
+  &.color9 {
+    --tag-background-color: #ebb438;
+    --tag-border-color: #e3a31f;
+  }
+
+
+  &.color10 {
+    --tag-background-color: #7fd97a;
+    --tag-border-color: #50cf4c;
+  }
+
+  &.color11 {
+    --tag-background-color: #64c85f;
+    --tag-border-color: #3cbb39;
+  }
+
+  &.color12 {
+    --tag-background-color: #45b341;
+    --tag-border-color: #27a225;
+  }
+
+
+  &.color13 {
+    --tag-background-color: #669df7;
+    --tag-border-color: #3a7ff3;
+  }
+
+  &.color14 {
+    --tag-background-color: #4e81f3;
+    --tag-border-color: #2b64ee;
+  }
+
+  &.color15 {
+    --tag-background-color: #3460ee;
+    --tag-border-color: #1b45e7;
+  }
+
+
+  &.color16 {
+    --tag-background-color: #7976e6;
+    --tag-border-color: #554fe1;
+  }
+
+  &.color17 {
+    --tag-background-color: #403bd4;
+    --tag-border-color: #5e5cdb;
+  }
+
+  &.color18 {
+    --tag-background-color: #413fcd;
+    --tag-border-color: #2a26c3;
+  }
+
+
+  &.color19 {
+    --tag-background-color: #bf81dc;
+    --tag-border-color: #ab5ad1;
+  }
+
+  &.color20 {
+    --tag-background-color: #9044be;
+    --tag-border-color: #a766cd;
+  }
+
+  &.color21 {
+    --tag-background-color: #8947ba;
+    --tag-border-color: #6f2da6;
+  }
+
+
+  &.color22 {
+    --tag-background-color: #959599;
+    --tag-border-color: #adadb1;
+  }
+
+  &.color23 {
+    --tag-background-color: #929296;
+    --tag-border-color: #79797d;
+  }
+
+  &.color24 {
+    --tag-background-color: #717175;
+    --tag-border-color: #58585c;
+  }
+}
+
+.tag-name {
+  display: block;
+  padding: 3px 0 2px 0;
+}
+
+.tag-controls {
+  display: flex;
+  gap: 4px;
+  padding: 1px 0;
+  margin-right: -7px;
+}
+
+.tag-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: 15px;
+  height: 15px;
+  background-color: rgba(255 255 255 / 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    margin: auto;
+    background-color: white;
+  }
+
+  &:hover {
+    background-color: white;
+
+    &:before,
+    &:after {
+      background-color: var(--tag-background-color);
+    }
+  }
+}
+
+.tag-control_detach {
+  &:before {
+    inset: 0;
+    width: 11px;
+    height: 1px;
+    scale: 1 1.5;
+  }
+}
+
+.tag-control_delete {
+  &:before,
+  &:after {
+    inset: 0;
+    width: 11px;
+    height: 1px;
+    scale: 1 1.5;
+    transform-origin: center center;
+  }
+
+  &:before {
+    rotate: -45deg;
+  }
+
+  &:after {
+    rotate: 45deg;
   }
 }
 

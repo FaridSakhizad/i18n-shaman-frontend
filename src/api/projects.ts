@@ -3,7 +3,7 @@ import {
   IKey,
   IKeyUpdateError,
   IKeyValue,
-  IProject, ISearchParams,
+  IProject, ISearchParams, ITag,
 } from 'interfaces';
 import { apiClient } from './client';
 
@@ -254,6 +254,68 @@ export const importDataToProject = async (data: any) => {
 export const importComponentsToProject = async (data: any) => {
   try {
     return (await apiClient.post('importComponentsDataToProject', data)).data;
+  } catch (error: any) {
+    return error.response && error.response.data;
+  }
+};
+
+export interface IAddTagToEntities {
+  projectId: string;
+  entityIds: string[];
+  tagName: string;
+  color: string;
+}
+
+export const addTagToEntities = async (data: IAddTagToEntities) => {
+  try {
+    return (await apiClient.post('addTagsToEntities', data)).data;
+  } catch (error: any) {
+    return error.response && error.response.data;
+  }
+};
+
+export interface IAssignTagToEntities {
+  projectId: string;
+  entityIds: string[];
+  tagId: string;
+}
+
+export const assignTagToEntities = async (data: IAssignTagToEntities) => {
+  try {
+    return (await apiClient.post('assignTagToEntities', data)).data;
+  } catch (error: any) {
+    return error.response && error.response.data;
+  }
+};
+
+export const detachTagFromEntities = async (data: IAssignTagToEntities) => {
+  try {
+    return (await apiClient.post('detachTagFromEntities', data)).data;
+  } catch (error: any) {
+    return error.response && error.response.data;
+  }
+};
+
+export interface IDeleteTag {
+  projectId: string;
+  tagId: string;
+}
+
+export const deleteTag = async (data: IDeleteTag) => {
+  try {
+    return (await apiClient.post('deleteTag', data)).data;
+  } catch (error: any) {
+    return error.response && error.response.data;
+  }
+};
+
+export interface IUpdateTag extends ITag {
+  projectId: string;
+}
+
+export const updateTag = async (data: IUpdateTag) => {
+  try {
+    return (await apiClient.post('updateTag', data)).data;
   } catch (error: any) {
     return error.response && error.response.data;
   }

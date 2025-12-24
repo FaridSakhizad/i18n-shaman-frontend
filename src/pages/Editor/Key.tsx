@@ -5,7 +5,13 @@ import React, {
   useEffect,
 } from 'react';
 
-import { EntityType, IKeyValue, IProjectLanguage } from 'interfaces';
+import {
+  EntityType,
+  IKeyTag,
+  IKeyValue,
+  IProjectLanguage,
+  ITag,
+} from 'interfaces';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { createSystemNotification, EMessageType } from 'store/systemNotifications';
@@ -29,6 +35,8 @@ interface IProps {
   description: string;
   path?: string;
   pathCache: string;
+  tags: IKeyTag[]
+  projectTags: ITag[]
 }
 
 export default function Key(props: IProps) {
@@ -42,6 +50,8 @@ export default function Key(props: IProps) {
     description,
     path = null,
     pathCache,
+    tags,
+    projectTags = [],
   } = props;
 
   const dispatch = useDispatch();
@@ -153,6 +163,8 @@ export default function Key(props: IProps) {
     dispatch(setSelectedEntities(Array.from(uniqueEntityIds)));
   };
 
+  const projectTagsByIdMap = new Map((projectTags || []).map((tag) => [tag.id, tag]));
+
   return (
     <section className="key key_string">
       <div className="keyHeader">
@@ -174,8 +186,34 @@ export default function Key(props: IProps) {
           {label}
         </button>
 
+        {tags && (
+          <div className="keyHeader-tags">
+            {tags.map((tag) => {
+              if (!projectTagsByIdMap.has(tag.id)) {
+                return null;
+              }
+
+              const {color} = projectTagsByIdMap.get(tag.id) || {};
+
+              return (
+                <span className={`tag ${color}`} key={tag.id}>
+                  <span className="tag-name">{projectTagsByIdMap.get(tag.id)?.name}</span>
+                </span>
+              );
+            })}
+          </div>
+        )}
+
         <div className="keyHeader-controls">
           <div className="keyHeader-controlsGroup">
+            <button
+              type="button"
+              className="_tags-edit buttonInline keyHeader-control keyHeader-editTags"
+              data-click-target="editTags"
+              data-id={id}
+              aria-label="Edit Tags"
+            />
+
             <button
               type="button"
               className="_entity-edit buttonInline keyHeader-control keyHeader-edit"

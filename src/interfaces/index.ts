@@ -27,6 +27,10 @@ export interface IKeyValue {
   pathCache?: string;
 }
 
+export interface IKeyTag {
+  id: string;
+}
+
 export interface IKey {
   projectId: string;
   id: string;
@@ -39,6 +43,7 @@ export interface IKey {
   description: string;
   type: EntityType;
   pathCache: string;
+  tags: IKeyTag[]
 }
 
 export interface IKeyUpdateError extends IError {}
@@ -58,6 +63,13 @@ export interface IProjectLanguage extends ILanguage {
   customLabel?: string,
 }
 
+export interface ITag {
+  id: string;
+  name: string;
+  color: string;
+  customColor?: string;
+}
+
 export interface IProject {
   projectName: string;
   projectId: string;
@@ -68,6 +80,7 @@ export interface IProject {
   keysTotalCount?: number;
   subfolder?: IKey;
   upstreamParents?: [IKey]
+  tags: ITag[];
 }
 
 export interface IProjectUpdateError extends IError {}

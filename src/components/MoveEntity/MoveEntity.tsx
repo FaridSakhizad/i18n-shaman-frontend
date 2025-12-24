@@ -203,8 +203,6 @@ export default function MoveEntity(props: IProps) {
     onConfirm();
   };
 
-  console.log('selectedEntities', selectedEntities);
-
   return (
     <>
       <Modal

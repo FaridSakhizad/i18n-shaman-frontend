@@ -7,9 +7,8 @@ import clsx from 'clsx';
 import { AppDispatch, IRootState } from 'store';
 import { getProjects, updateProject } from 'store/projects';
 import { setSelectedEntities } from 'store/editorPage';
-import { createGlobalMessage } from 'store/globalMessages';
 
-import { createSystemNotification, EContentType, EMessageType } from 'store/systemNotifications';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import { DEFAULT_ITEMS_PER_PAGE, ROOT } from 'constants/app';
 
@@ -25,6 +24,7 @@ import {
 } from 'interfaces';
 
 import {
+  addTagToEntities, assignTagToEntities,
   deleteProjectEntities,
   duplicateEntities,
   getUserProjectById,
@@ -44,13 +44,13 @@ import Footer from 'components/Footer';
 import Dropdown from 'components/Dropdown';
 import Tooltip from 'components/Tooltip';
 import Modal from 'components/Modal';
-import CookieMessage from 'components/CookieMessage';
-import { registerSystemMessageComponent } from 'components/SystemBar/SystemMessageRegistry';
 
 import ItemsList from './ItemsList';
 import EditProject from '../Projects/EditProject';
 
 import './Editor.scss';
+import EntityTagsMenu from './EntityTagsMenu';
+import TagsEditor from './TagsEditor';
 
 export default function Editor() {
   const dispatch = useDispatch<AppDispatch>();
@@ -375,6 +375,9 @@ export default function Editor() {
     window.history.pushState({}, '', url);
   };
 
+  const [tagsMenuVisible, setTagsMenuVisible] = useState<boolean>(false);
+  const [tagsMenuAnchorSelector, setTagsMenuAnchorSelector] = useState<string | null>();
+
   const handleItemsListClickEvent = async (e: React.SyntheticEvent<HTMLElement>) => {
     const { target } = e;
 
@@ -433,6 +436,18 @@ export default function Editor() {
       dispatch(setSelectedEntities([dataset.id as string]));
 
       setIsMoveEntityModalVisible(true);
+    }
+
+    if (elName === 'editTags') {
+      if (!tagsMenuVisible) {
+        setInEditKeyId(dataset.id as string);
+        setTagsMenuAnchorSelector(`._tags-edit[data-id="${dataset.id}"]`);
+        setTagsMenuVisible(true);
+      } else {
+        setInEditKeyId(undefined);
+        setTagsMenuAnchorSelector(null);
+        setTagsMenuVisible(false);
+      }
     }
 
     if (elName === 'pagePrev') {
@@ -692,7 +707,7 @@ export default function Editor() {
   const handleDuplicateSelectedClick = async () => {
     setLoading(true);
 
-    const result = await duplicateEntities({
+    await duplicateEntities({
       projectId: currentProjectId,
       entityIds: selectedEntities,
     });
@@ -711,6 +726,12 @@ export default function Editor() {
     await fetchProjectData();
     setLoading(false);
   };
+
+  const [tagsEditModalVisible, setTagsEditModalVisible] = useState(true);
+
+  const handleTagsButtonClick = () => {
+    setTagsEditModalVisible(true);
+  }
 
   return (
     <>
@@ -883,13 +904,50 @@ export default function Editor() {
         </Modal>
       )}
 
+      {tagsMenuVisible && (
+        <Dropdown
+          anchor={tagsMenuAnchorSelector as string}
+          onOutsideClick={() => setTagsMenuVisible(false)}
+          classNames="tagsMenuDropdown"
+          orientation="tr-br"
+        >
+          <EntityTagsMenu
+            project={project as IProject}
+            entityId={inEditKeyId as string}
+          />
+        </Dropdown>
+      )}
+
+      {project && tagsEditModalVisible && (
+        <Modal
+          onEscapeKeyPress={() => {
+            setExtendedSearchModalVisible(false);
+          }}
+          customClassNames="modal_tagsEdit modal_withBottomButtons"
+        >
+          <div className="modal-header">
+            <h4 className="modal-title">Manage Tags</h4>
+            <button
+              type="button"
+              className="modal-closeButton"
+              onClick={() => setTagsEditModalVisible(false)}
+              aria-label="Close modal"
+            />
+          </div>
+
+          <TagsEditor
+            project={project as IProject}
+          />
+        </Modal>
+      )}
+
       {isProjectsMenuVisible && (
         <Dropdown
           anchor="._button-projects-menu"
           onOutsideClick={() => setIsProjectsMenuVisible(false)}
           classNames="editorHeader-projectListMenu"
         >
-          {orderedProjects && orderedProjects.map(({ projectName, projectId }) => {
+          {orderedProjects && orderedProjects.map(({projectName, projectId }) => {
             if (projectId === currentProjectId) {
               return (
                 <div
@@ -1296,6 +1354,14 @@ export default function Editor() {
           >
             Filters
           </button>
+
+          <button
+            type="button"
+            className="button primary editorControls-button"
+            onClick={handleTagsButtonClick}
+          >
+            Tags
+          </button>
         </div>
 
         <div className="editorCreateBlock">
@@ -1337,6 +1403,7 @@ export default function Editor() {
             parentId={project.projectId}
             projectId={project.projectId}
             languages={project.languages}
+            projectTags={project.tags}
             path={ROOT}
             pathCache={ROOT}
             page={page}
