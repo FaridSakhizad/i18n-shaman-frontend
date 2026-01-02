@@ -442,9 +442,9 @@ input:-webkit-autofill:focus {
   text-decoration: none;
   font-size: 11px;
   line-height: 13px;
-  border-radius: 65536px;
+  border-radius: 10px;
   padding: 3px 8px 2px 8px;
-  text-align: center;
+  text-align: left;
   font-family: var(--main-font-family);
   color: white;
 
@@ -457,7 +457,11 @@ input:-webkit-autofill:focus {
 
   background-color: var(--tag-background-color);
   border: 1px solid var(--tag-border-color);
-  height: 19px;
+  min-height: 19px;
+
+  &.disabled {
+    opacity: 0.65;
+  }
 }
 
 .tag,
@@ -598,7 +602,7 @@ input:-webkit-autofill:focus {
 
 .tag-name {
   display: block;
-  padding: 3px 0 2px 0;
+  padding: 3px 0 1px 0;
 }
 
 .tag-controls {
@@ -642,15 +646,6 @@ input:-webkit-autofill:focus {
 }
 
 .tag-control_detach {
-  &:before {
-    inset: 0;
-    width: 11px;
-    height: 1px;
-    scale: 1 1.5;
-  }
-}
-
-.tag-control_delete {
   &:before,
   &:after {
     inset: 0;

@@ -259,6 +259,19 @@ export const importComponentsToProject = async (data: any) => {
   }
 };
 
+export interface ICreateTag {
+  projectId: string;
+  tagName: string;
+}
+
+export const createTag = async (data: ICreateTag) => {
+  try {
+    return (await apiClient.post('createTag', data)).data;
+  } catch (error: any) {
+    return error.response && error.response.data;
+  }
+};
+
 export interface IAddTagToEntities {
   projectId: string;
   entityIds: string[];

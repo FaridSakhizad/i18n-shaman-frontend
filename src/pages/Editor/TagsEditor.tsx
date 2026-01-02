@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { IProject, ITag } from 'interfaces';
 
 import './TagsEditor.css';
-import { deleteTag, updateTag } from '../../api/projects';
+import { createTag, deleteTag, updateTag } from '../../api/projects';
 import Modal from '../../components/Modal';
 
 interface IProps {
@@ -25,6 +25,25 @@ export default function TagsEditor(props: IProps) {
   const [selectedCustomColor, setSelectedCustomColor] = useState<string | null>(null);
 
   const [tagToDelete, setTagToDelete] = useState<ITag | null>(null);
+
+  const [newTagName, setNewTagName] = useState<string | null>(null);
+
+  const handleNewTagNameChange = ({ target: { value: name } }: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTagName(name);
+  }
+
+  const handleCreateTagClick = async () => {
+    const result = await createTag({
+      projectId: project.projectId,
+      tagName: newTagName as string,
+    })
+
+    setNewTagName(null);
+
+    const { data } = result;
+
+    setTagsList(data.tags);
+  }
 
   const handleEditTagButtonClick = (tag: ITag) => {
     setTagInEdit(tag);
@@ -126,11 +145,33 @@ export default function TagsEditor(props: IProps) {
     });
 
     setTagToDelete(null);
+
+    const { data } = result;
+
+    setTagsList(data.tags);
   }
 
   return (
     <>
       <div className="tagsEditor">
+        <div className={clsx({
+          'tagsEditor-create': true,
+          disabled: tagInEdit || tagToDelete,
+        })}>
+          <input
+            type="text"
+            className="input tagsEditor-createInput"
+            value={newTagName || ''}
+            onChange={handleNewTagNameChange}
+            placeholder="New Tag name..."
+          />
+          <button
+            type="button"
+            className="button success tagsEditor-createButton"
+            onClick={handleCreateTagClick}
+          >New Tag</button>
+        </div>
+
         <div className="tagsEditor-list">
           {tagsList.map((tag: ITag) => {
             if (tagInEdit && (tag.id === tagInEdit.id)) {
@@ -190,7 +231,8 @@ export default function TagsEditor(props: IProps) {
                   className={clsx({
                     tag: true,
                     [tag.color as string]: !tag.customColor || tag.customColor === null,
-                    custom: tag.customColor && tag.customColor !== null
+                    custom: tag.customColor && tag.customColor !== null,
+                    disabled: !!tagInEdit || !!tagToDelete,
                   })}
                   style={{ '--custom-color': tag.customColor as string } as React.CSSProperties}
                 >{tag.name}</span>
@@ -200,14 +242,14 @@ export default function TagsEditor(props: IProps) {
                     <>
                       <button
                         type="button"
-                        className="button secondary tagsEditor-listItemControlButton"
-                        onClick={handleCancelDeleteClick}
-                      >Cancel</button>
-                      <button
-                        type="button"
                         className="button danger tagsEditor-listItemControlButton"
                         onClick={handleConfirmDeleteClick}
                       >Delete</button>
+                      <button
+                        type="button"
+                        className="button secondary tagsEditor-listItemControlButton"
+                        onClick={handleCancelDeleteClick}
+                      >Cancel</button>
                     </>
                   ) : (
                     <>
@@ -216,12 +258,14 @@ export default function TagsEditor(props: IProps) {
                         className="buttonInline tagsEditor-listItemControl tagsEditor-listItemControl_edit"
                         aria-label="Edit"
                         onClick={() => handleEditTagButtonClick(tag)}
+                        disabled={!!tagInEdit || !!tagToDelete}
                       />
                       <button
                         type="button"
                         className="buttonInline tagsEditor-listItemControl tagsEditor-listItemControl_delete"
                         aria-label="Delete"
                         onClick={() => handleDeleteTagButtonClick(tag)}
+                        disabled={!!tagInEdit || !!tagToDelete}
                       />
                     </>
                   )}
@@ -240,7 +284,7 @@ export default function TagsEditor(props: IProps) {
                 className={clsx({
                   tag: true,
                   [selectedColor as string]: selectedCustomColor === null,
-                  custom: selectedCustomColor !== null
+                  custom: selectedCustomColor && selectedCustomColor !== null
                 })}
                 style={{'--custom-color': selectedCustomColor as string } as React.CSSProperties}
               >{tagInEdit.name}</span>

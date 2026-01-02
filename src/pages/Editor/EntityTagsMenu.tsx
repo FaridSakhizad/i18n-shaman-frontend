@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { IProject } from '../../interfaces';
 import {
   addTagToEntities,
@@ -11,10 +11,19 @@ import { retry } from '@reduxjs/toolkit/query';
 interface IProps {
   project: IProject;
   entityId: string;
+  onCreate: () => void;
+  onAttach: () => void;
+  onDetach: () => void;
 }
 
 export default function EntityTagsMenu(props: IProps) {
-  const { project, entityId } = props;
+  const {
+    project,
+    entityId,
+    onCreate = () => {},
+    onAttach = () => {},
+    onDetach = () => {},
+  } = props;
 
   const { projectId: currentProjectId } = project;
 
@@ -24,8 +33,11 @@ export default function EntityTagsMenu(props: IProps) {
 
   const [newTagName, setNewTagName] = useState<string | null>(null);
 
-  const onTagNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTagName(e.target.value);
+  const newTagNameRef = useRef<string>(newTagName || '');
+  newTagNameRef.current = newTagName || '';
+
+  const onTagNameChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTagName(value);
   };
 
   const projectTagsByIdMap = new Map((project.tags || []).map((tag) => [tag.id, tag]));
@@ -37,7 +49,11 @@ export default function EntityTagsMenu(props: IProps) {
       return null
     }
 
-    const searchQuery = newTagName?.trim().toLowerCase();
+    if (!newTagNameRef.current) {
+      return null;
+    }
+
+    const searchQuery = newTagNameRef.current.trim().toLowerCase();
 
     if (!searchQuery || searchQuery.length < 1) {
       return null;
@@ -49,8 +65,7 @@ export default function EntityTagsMenu(props: IProps) {
   const filteredTagsList = getFilteredTagsList();
 
   const getTagsListToRender = () => {
-    const list = (filteredTagsList && filteredTagsList.length > 0) ? filteredTagsList : (project?.tags || [])
-
+    const list = (filteredTagsList && filteredTagsList.length > 0) ? filteredTagsList : [];
 
     return list.filter((tag) => !entityTagsSet.has(tag.id))
   }
@@ -70,6 +85,8 @@ export default function EntityTagsMenu(props: IProps) {
       tagName: newTagName,
       color: `color${colorIndex}`,
     });
+
+    onCreate();
   };
 
   const handleProjectTagClick = async (id: string) => {
@@ -78,6 +95,8 @@ export default function EntityTagsMenu(props: IProps) {
       entityIds: [entityId as string],
       tagId: id
     });
+
+    onAttach();
   }
 
   const handleDetachTag = async (id: string) => {
@@ -86,19 +105,9 @@ export default function EntityTagsMenu(props: IProps) {
       entityIds: [entityId as string],
       tagId: id
     });
+
+    onAttach();
   }
-
-  const handleDeleteTag = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const result = await deleteTag({
-      projectId: currentProjectId,
-      tagId: id
-    });
-  }
-
-  //
 
   const displayCreateButton: boolean = (() => {
     if (!project.tags || project.tags.length < 1) {
@@ -139,8 +148,6 @@ export default function EntityTagsMenu(props: IProps) {
               })}
             </div>
           </div>
-
-          <hr className="tagsMenuSeparator" />
         </>
       )}
 
@@ -170,14 +177,7 @@ export default function EntityTagsMenu(props: IProps) {
               key={`${idx + tag.id}`}
               onClick={() => handleProjectTagClick(tag.id)}
             >
-              <span className="tag-name">{tag.name}</span>
-              <span className="tag-controls">
-                  <button
-                    type="button"
-                    className="tag-control tag-control_delete"
-                    onClick={(e) => handleDeleteTag(e, tag.id)}
-                  />
-                </span>
+              {tag.name}
             </span>
           ))}
         </div>

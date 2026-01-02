@@ -1,5 +1,24 @@
 .tagsEditor {}
 
+.tagsEditor-create {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 30px;
+
+    &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}
+
+.tagsEditor-createInput {
+    flex: 1 1 0;
+}
+
+.tagsEditor-createButton {
+    padding-inline: 18px;
+}
+
 .tagsEditor-list {
     display: flex;
     flex-direction: column;
@@ -33,6 +52,11 @@
 
     &:before {
         background-color: white;
+    }
+
+    &[disabled] {
+        opacity: 0.8;
+        pointer-events: none;
     }
 }
 
@@ -80,6 +104,7 @@
     align-items: center;
     gap: 12px;
     width: 100%;
+    margin-bottom: 1px;
 }
 
 .tagsEdit-input {
@@ -181,6 +206,10 @@
 .tagsEditor-tagRow {
     display: flex;
     margin-bottom: 24px;
+
+    .tag {
+        margin-right: auto;
+    }
 }
 
 .tagsEditor-moreColorsButton {
@@ -192,7 +221,8 @@
         font-size: 12px;
         line-height: 13px;
         padding: 4px 10px 1px 10px;
-        margin-left: auto;
+        white-space: nowrap;
+        margin-left: 18px;
     }
 }
 

@@ -378,6 +378,30 @@ export default function Editor() {
   const [tagsMenuVisible, setTagsMenuVisible] = useState<boolean>(false);
   const [tagsMenuAnchorSelector, setTagsMenuAnchorSelector] = useState<string | null>();
 
+  const onTagCreate = () => {
+    setInEditKeyId(undefined);
+    setTagsMenuAnchorSelector(null);
+    setTagsMenuVisible(false);
+
+    fetchProjectData();
+  }
+
+  const onTagAttach = () => {
+    setInEditKeyId(undefined);
+    setTagsMenuAnchorSelector(null);
+    setTagsMenuVisible(false);
+
+    fetchProjectData();
+  }
+
+  const onTagDetach = () => {
+    setInEditKeyId(undefined);
+    setTagsMenuAnchorSelector(null);
+    setTagsMenuVisible(false);
+
+    fetchProjectData();
+  }
+
   const handleItemsListClickEvent = async (e: React.SyntheticEvent<HTMLElement>) => {
     const { target } = e;
 
@@ -727,7 +751,7 @@ export default function Editor() {
     setLoading(false);
   };
 
-  const [tagsEditModalVisible, setTagsEditModalVisible] = useState(true);
+  const [tagsEditModalVisible, setTagsEditModalVisible] = useState(false);
 
   const handleTagsButtonClick = () => {
     setTagsEditModalVisible(true);
@@ -914,6 +938,9 @@ export default function Editor() {
           <EntityTagsMenu
             project={project as IProject}
             entityId={inEditKeyId as string}
+            onCreate={onTagCreate}
+            onAttach={onTagAttach}
+            onDetach={onTagDetach}
           />
         </Dropdown>
       )}
@@ -1341,7 +1368,7 @@ export default function Editor() {
         <div className="editorControls">
           <button
             type="button"
-            className="button primary editorControls-button _button-sorting"
+            className="button primary editorControls-button editorControls-button_dd _button-sorting"
             onClick={handleSortByButtonClick}
           >
             Sort by
@@ -1349,7 +1376,7 @@ export default function Editor() {
 
           <button
             type="button"
-            className="button primary editorControls-button _button-filters"
+            className="button primary editorControls-button editorControls-button_dd _button-filters"
             onClick={handleFiltersButtonClick}
           >
             Filters
