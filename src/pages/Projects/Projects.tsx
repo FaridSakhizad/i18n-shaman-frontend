@@ -64,7 +64,7 @@ export default function Projects() {
     return (
       <Modal customClassNames="dialogModal">
         <div className="modal-header">
-          <h4 className="modal-title">Delete Project Language</h4>
+          <h4 className="modal-title">Delete Project?</h4>
 
           <button
             type="button"
@@ -78,7 +78,7 @@ export default function Projects() {
           <div className="dialogModal-content">
             <i className="dialogBadge question danger dialogModal-badge" />
             <div className="dialogModal-contentText">
-              <p className="dialogModal-contentPara">Are you sure you want to Delete Project Language <b>Russian (Ru)</b> and all it’s translations? <b>Warning: this action can not be reverted.</b></p>
+              <p className="dialogModal-contentPara">Are you sure you want to Delete Project <b>Warning: this action can not be reverted.</b></p>
             </div>
           </div>
         </div>

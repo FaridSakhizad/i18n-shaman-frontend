@@ -24,7 +24,6 @@ import {
 } from 'interfaces';
 
 import {
-  addTagToEntities, assignTagToEntities,
   deleteProjectEntities,
   duplicateEntities,
   getUserProjectById,
@@ -104,6 +103,18 @@ export default function Editor() {
 
   const [filters, setFilters] = useState<IFilter>(getInitialFilters());
 
+  const getInitialTags = () => {
+    const data = urlSearchParams.get('tags');
+
+    if (!data) {
+      return [];
+    }
+
+    return data.split(',').filter(Boolean);
+  };
+
+  const [tags, setTags] = useState<string[]>(getInitialTags());
+
   const getInitialSearchQuery = () => {
     const { location } = window;
 
@@ -176,6 +187,7 @@ export default function Editor() {
       itemsPerPage,
       ...sorting,
       filters,
+      tags,
       search: searchQuery,
       searchParams,
     });
@@ -193,7 +205,7 @@ export default function Editor() {
     dispatch(getProjects(userId as string));
 
     fetchProjectData();
-  }, [currentProjectId, subFolderId, page, sorting, filters, searchParams, searchQueryRequest]);
+  }, [currentProjectId, subFolderId, page, sorting, filters, tags, searchParams, searchQueryRequest]);
 
   const handleAddLanguageClick = async () => {
     setAddLanguageModalVisible(true);
@@ -384,7 +396,7 @@ export default function Editor() {
     setTagsMenuVisible(false);
 
     fetchProjectData();
-  }
+  };
 
   const onTagAttach = () => {
     setInEditKeyId(undefined);
@@ -392,7 +404,7 @@ export default function Editor() {
     setTagsMenuVisible(false);
 
     fetchProjectData();
-  }
+  };
 
   const onTagDetach = () => {
     setInEditKeyId(undefined);
@@ -400,7 +412,37 @@ export default function Editor() {
     setTagsMenuVisible(false);
 
     fetchProjectData();
-  }
+  };
+
+  const handleEntityTagClick = (tagId: string) => {
+    const { location } = window;
+
+    const url = new URL(location.href);
+
+    const tagsString = url.searchParams.get('tags') || '';
+
+    const tagsSet = new Set(tagsString.length > 0 ? tagsString.split(',') : []);
+
+    if (tagsSet.has(tagId)) {
+      tagsSet.delete(tagId);
+    } else {
+      tagsSet.add(tagId);
+    }
+
+    const tagsArray = Array.from(tagsSet);
+
+    setTags(tagsArray);
+
+    const tagsData = tagsArray.join(',');
+
+    if (tagsData.length > 1) {
+      url.searchParams.set('tags', tagsData);
+    } else {
+      url.searchParams.delete('tags');
+    }
+
+    window.history.pushState({}, '', url);
+  };
 
   const handleItemsListClickEvent = async (e: React.SyntheticEvent<HTMLElement>) => {
     const { target } = e;
@@ -472,6 +514,10 @@ export default function Editor() {
         setTagsMenuAnchorSelector(null);
         setTagsMenuVisible(false);
       }
+    }
+
+    if (elName === 'tag') {
+      handleEntityTagClick(dataset.id as string);
     }
 
     if (elName === 'pagePrev') {
@@ -755,7 +801,11 @@ export default function Editor() {
 
   const handleTagsButtonClick = () => {
     setTagsEditModalVisible(true);
-  }
+  };
+
+  const onActiveTagsChange = (data: string[]) => {
+    setTags(data);
+  };
 
   return (
     <>
@@ -947,9 +997,7 @@ export default function Editor() {
 
       {project && tagsEditModalVisible && (
         <Modal
-          onEscapeKeyPress={() => {
-            setExtendedSearchModalVisible(false);
-          }}
+          onEscapeKeyPress={() => setTagsEditModalVisible(false)}
           customClassNames="modal_tagsEdit modal_withBottomButtons"
         >
           <div className="modal-header">
@@ -964,6 +1012,7 @@ export default function Editor() {
 
           <TagsEditor
             project={project as IProject}
+            onActiveTagsChange={onActiveTagsChange}
           />
         </Modal>
       )}
@@ -974,7 +1023,7 @@ export default function Editor() {
           onOutsideClick={() => setIsProjectsMenuVisible(false)}
           classNames="editorHeader-projectListMenu"
         >
-          {orderedProjects && orderedProjects.map(({projectName, projectId }) => {
+          {orderedProjects && orderedProjects.map(({ projectName, projectId }) => {
             if (projectId === currentProjectId) {
               return (
                 <div
@@ -1387,7 +1436,7 @@ export default function Editor() {
             className="button primary editorControls-button"
             onClick={handleTagsButtonClick}
           >
-            Tags
+            Tags...
           </button>
         </div>
 

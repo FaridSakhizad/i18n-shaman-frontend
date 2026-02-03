@@ -20,8 +20,9 @@ import { updateKey } from 'api/projects';
 import { IRootState } from 'store';
 
 import './Key.scss';
-import { ROOT } from '../../constants/app';
-import { setSelectedEntities } from '../../store/editorPage';
+import { ROOT } from '../../../constants/app';
+import { setSelectedEntities } from '../../../store/editorPage';
+import clsx from 'clsx';
 
 interface IProps {
   id: string;
@@ -193,11 +194,27 @@ export default function Key(props: IProps) {
                 return null;
               }
 
-              const {color} = projectTagsByIdMap.get(tag.id) || {};
+              const { color, customColor } = projectTagsByIdMap.get(tag.id) || {};
 
               return (
-                <span className={`tag ${color}`} key={tag.id}>
-                  <span className="tag-name">{projectTagsByIdMap.get(tag.id)?.name}</span>
+                <span
+                  className={clsx({
+                    tag: true,
+                    [color as string]: !customColor || customColor === null,
+                    custom: customColor && customColor !== null,
+                  })}
+                  style={{ '--custom-color': customColor as string } as React.CSSProperties}
+                  key={tag.id}
+                  data-click-target="tag"
+                  data-id={tag.id}
+                >
+                  <span
+                    className="tag-name"
+                    data-click-target="tag"
+                    data-id={tag.id}
+                  >
+                    {projectTagsByIdMap.get(tag.id)?.name}
+                  </span>
                 </span>
               );
             })}

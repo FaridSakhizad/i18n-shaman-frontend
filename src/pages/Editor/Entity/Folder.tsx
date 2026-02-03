@@ -16,11 +16,11 @@ import {
 } from 'interfaces';
 
 // eslint-disable-next-line import/no-cycle
-import ItemsList from './ItemsList';
+import ItemsList from '../ItemsList';
 
 import './Key.scss';
-import { IRootState } from '../../store';
-import { setSelectedEntities } from '../../store/editorPage';
+import { IRootState } from '../../../store';
+import { setSelectedEntities } from '../../../store/editorPage';
 
 interface IProps {
   id: string;
@@ -96,6 +96,8 @@ export default function FolderComponent({
     dispatch(setSelectedEntities(Array.from(uniqueEntityIds)));
   };
 
+  const projectTagsByIdMap = new Map((projectTags || []).map((tag) => [tag.id, tag]));
+
   return (
     <section
       className={clsx({
@@ -117,6 +119,40 @@ export default function FolderComponent({
         />
 
         <Link title={description} className="keyName" to={`/project/${currentProjectId}/${id}`}>{label}</Link>
+
+        {tags && (
+          <div className="keyHeader-tags">
+            {tags.map((tag) => {
+              if (!projectTagsByIdMap.has(tag.id)) {
+                return null;
+              }
+
+              const { color, customColor } = projectTagsByIdMap.get(tag.id) || {};
+
+              return (
+                <span
+                  className={clsx({
+                    tag: true,
+                    [color as string]: !customColor || customColor === null,
+                    custom: customColor && customColor !== null,
+                  })}
+                  style={{ '--custom-color': customColor as string } as React.CSSProperties}
+                  key={tag.id}
+                  data-click-target="tag"
+                  data-id={tag.id}
+                >
+                  <span
+                    className="tag-name"
+                    data-click-target="tag"
+                    data-id={tag.id}
+                  >
+                    {projectTagsByIdMap.get(tag.id)?.name}
+                  </span>
+                </span>
+              );
+            })}
+          </div>
+        )}
 
         {/*
           <button
@@ -154,6 +190,14 @@ export default function FolderComponent({
           </div>
 
           <div className="keyHeader-controlsGroup">
+            <button
+              type="button"
+              className="_tags-edit buttonInline keyHeader-control keyHeader-editTags"
+              data-click-target="editTags"
+              data-id={id}
+              aria-label="Edit Tags"
+            />
+
             <button
               type="button"
               className="_entity-edit buttonInline keyHeader-control keyHeader-edit"

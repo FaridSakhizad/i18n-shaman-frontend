@@ -7,6 +7,7 @@ import {
   detachTagFromEntities
 } from 'api/projects';
 import { retry } from '@reduxjs/toolkit/query';
+import clsx from 'clsx';
 
 interface IProps {
   project: IProject;
@@ -46,29 +47,29 @@ export default function EntityTagsMenu(props: IProps) {
     const { tags } = project as IProject || {};
 
     if (!tags || tags.length < 1) {
-      return null
+      return null;
     }
 
     if (!newTagNameRef.current) {
-      return null;
+      return tags;
     }
 
     const searchQuery = newTagNameRef.current.trim().toLowerCase();
 
     if (!searchQuery || searchQuery.length < 1) {
-      return null;
+      return tags;
     }
 
-    return tags.filter(tag => tag.name.toLowerCase().includes(searchQuery));
-  }
+    return tags.filter((tag) => tag.name.toLowerCase().includes(searchQuery));
+  };
 
   const filteredTagsList = getFilteredTagsList();
 
   const getTagsListToRender = () => {
     const list = (filteredTagsList && filteredTagsList.length > 0) ? filteredTagsList : [];
 
-    return list.filter((tag) => !entityTagsSet.has(tag.id))
-  }
+    return list.filter((tag) => !entityTagsSet.has(tag.id));
+  };
 
   const tagsListToRender = getTagsListToRender();
 
@@ -103,11 +104,11 @@ export default function EntityTagsMenu(props: IProps) {
     const result = await detachTagFromEntities({
       projectId: currentProjectId,
       entityIds: [entityId as string],
-      tagId: id
+      tagId: id,
     });
 
     onAttach();
-  }
+  };
 
   const displayCreateButton: boolean = (() => {
     if (!project.tags || project.tags.length < 1) {
@@ -120,35 +121,39 @@ export default function EntityTagsMenu(props: IProps) {
   return (
     <>
       {theEntity && theEntity.tags && theEntity.tags.length > 0 && (
-        <>
-          <div className="entityTags">
-            <div className="tagsMenu-list">
-              {theEntity.tags.map(({id: tagId}) => {
-                if (!projectTagsByIdMap.has(tagId)) {
-                  return null;
-                }
+        <div className="entityTags">
+          <div className="tagsMenu-list">
+            {theEntity.tags.map(({ id: tagId}) => {
+              if (!projectTagsByIdMap.has(tagId)) {
+                return null;
+              }
 
-                const { color, name } = projectTagsByIdMap.get(tagId) || {};
+              const { color, name, customColor } = projectTagsByIdMap.get(tagId) || {};
 
-                return (
-                  <span
-                    className={`tag ${color}`}
-                    key={tagId}
-                  >
-                    <span className="tag-name">{name}</span>
-                    <span className="tag-controls">
-                      <button
-                        type="button"
-                        className="tag-control tag-control_detach"
-                        onClick={() => handleDetachTag(tagId)}
-                      />
-                    </span>
+              return (
+                <span
+                  className={clsx({
+                    tag: true,
+                    [color as string]: !customColor || customColor === null,
+                    custom: customColor && customColor !== null,
+                  })}
+                  style={{ '--custom-color': customColor as string } as React.CSSProperties}
+                  key={tagId}
+                >
+                  <span className="tag-name">{name}</span>
+                  <span className="tag-controls">
+                    <button
+                      type="button"
+                      className="tag-control tag-control_detach"
+                      onClick={() => handleDetachTag(tagId)}
+                      aria-label="Detach Tag"
+                    />
                   </span>
-                )
-              })}
-            </div>
+                </span>
+              );
+            })}
           </div>
-        </>
+        </div>
       )}
 
       <div className="addTagControl">

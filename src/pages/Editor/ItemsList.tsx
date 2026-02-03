@@ -1,11 +1,17 @@
 import React, { Fragment } from 'react';
 import { DEFAULT_ITEMS_PER_PAGE, PROJECT_ITEMS_MAX_DEPTH } from 'constants/app';
-import { IKey, IKeyValue, IProjectLanguage, INavigationData, ITag } from 'interfaces';
+import {
+  IKey,
+  IKeyValue,
+  IProjectLanguage,
+  INavigationData,
+  ITag,
+} from 'interfaces';
 import clsx from 'clsx';
 
-import Key from './Key';
+import Key from './Entity/Key';
 // eslint-disable-next-line import/no-cycle
-import FolderComponent from './Folder';
+import FolderComponent from './Entity/Folder';
 
 interface IProps {
   keys: IKey[],

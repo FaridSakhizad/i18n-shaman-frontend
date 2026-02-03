@@ -462,6 +462,11 @@ input:-webkit-autofill:focus {
   &.disabled {
     opacity: 0.65;
   }
+
+  &.isActive {
+    outline: 2px solid var(--tag-border-color);
+    outline-offset: 2px;
+  }
 }
 
 .tag,

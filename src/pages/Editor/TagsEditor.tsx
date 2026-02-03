@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
 
 import { IProject, ITag } from 'interfaces';
@@ -9,14 +10,22 @@ import Modal from '../../components/Modal';
 
 interface IProps {
   project: IProject
+  onActiveTagsChange?: (data: string[]) => void
 }
 
 export default function TagsEditor(props: IProps) {
-  const { project } = props
+  const {
+    project,
+    onActiveTagsChange = () => {},
+  } = props;
 
   const { tags } = project;
 
-  const [ tagsList, setTagsList] = useState<ITag[]>(tags);
+  const useSearchParamsResult = useSearchParams();
+
+  const urlSearchParams = useSearchParamsResult[0];
+
+  const [tagsList, setTagsList] = useState<ITag[]>(tags);
 
   const [tagInEdit, setTagInEdit] = useState<ITag | null>(null);
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
@@ -30,43 +39,43 @@ export default function TagsEditor(props: IProps) {
 
   const handleNewTagNameChange = ({ target: { value: name } }: React.ChangeEvent<HTMLInputElement>) => {
     setNewTagName(name);
-  }
+  };
 
   const handleCreateTagClick = async () => {
     const result = await createTag({
       projectId: project.projectId,
       tagName: newTagName as string,
-    })
+    });
 
     setNewTagName(null);
 
     const { data } = result;
 
     setTagsList(data.tags);
-  }
+  };
 
   const handleEditTagButtonClick = (tag: ITag) => {
     setTagInEdit(tag);
-  }
+  };
 
   const handleDeleteTagButtonClick = (tag: ITag) => {
     setTagToDelete(tag);
-  }
+  };
 
   const handleTagNameChange = ({ target: { value: name } }: React.ChangeEvent<HTMLInputElement>) => {
     if (!tagInEdit) {
-      return null
-    };
+      return null;
+    }
 
     setTagInEdit({
       ...tagInEdit,
-      name
+      name,
     });
-  }
+  };
 
   const handleCancelClick = () => {
     setTagInEdit(null);
-  }
+  };
 
   const handleSaveClick = async () => {
     if (!tagInEdit) {
@@ -75,17 +84,17 @@ export default function TagsEditor(props: IProps) {
 
     const result = await updateTag({
       projectId: project.projectId,
-      ...tagInEdit as ITag
+      ...tagInEdit as ITag,
     });
 
-    const tagIdx = tagsList.findIndex(tag => tag.id === tagInEdit.id);
+    const tagIdx = tagsList.findIndex((tag) => tag.id === tagInEdit.id);
 
     tagsList[tagIdx] = tagInEdit;
 
     setTagsList([...tagsList]);
 
     setTagInEdit(null);
-  }
+  };
 
   const colorsArray = [
     1, 4, 7, 10, 13, 16, 19, 22,
@@ -96,13 +105,13 @@ export default function TagsEditor(props: IProps) {
   const handleColorClick = (color: string) => {
     setSelectedCustomColor(null);
     setSelectedColor(color);
-  }
+  };
 
   const handleColorPickerCancelClick = () => {
     setSelectedCustomColor(null);
     setSelectedColor(null);
     setShowColorPicker(false);
-  }
+  };
 
   const handleColorPickerOkayClick = () => {
     setTagInEdit({
@@ -114,11 +123,11 @@ export default function TagsEditor(props: IProps) {
     setSelectedColor(null);
     setSelectedCustomColor(null);
     setShowColorPicker(false);
-  }
+  };
 
   const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedCustomColor(e.target.value);
-  }
+  };
 
   const handleColorPickerClick = () => {
     if (!tagInEdit) {
@@ -128,15 +137,15 @@ export default function TagsEditor(props: IProps) {
     setSelectedColor(tagInEdit.color);
     setSelectedCustomColor(tagInEdit.customColor as string);
     setShowColorPicker(true);
-  }
+  };
 
   const handleCancelDeleteClick = () => {
     setTagToDelete(null);
-  }
+  };
 
   const handleConfirmDeleteClick = async () => {
     if (!tagToDelete) {
-      return
+      return;
     }
 
     const result = await deleteTag({
@@ -149,7 +158,57 @@ export default function TagsEditor(props: IProps) {
     const { data } = result;
 
     setTagsList(data.tags);
-  }
+  };
+
+  const getInitialTags = () => {
+    const { location } = window;
+
+    const url = new URL(location.href);
+
+    const data = url.searchParams.get('tags') || '';
+
+    if (!data) {
+      return [];
+    }
+
+    return data.split(',').filter(Boolean);
+  };
+
+  const [activeTags, setActiveTags] = useState<string[]>(getInitialTags());
+
+  const handleTagClick = (tagId: string) => {
+    const { location } = window;
+
+    const url = new URL(location.href);
+
+    const tagsString = url.searchParams.get('tags') || '';
+
+    const tagsSet = new Set(tagsString.length > 0 ? tagsString.split(',') : []);
+
+    if (tagsSet.has(tagId)) {
+      tagsSet.delete(tagId);
+    } else {
+      tagsSet.add(tagId);
+    }
+
+    const tagsArray = Array.from(tagsSet);
+
+    setActiveTags(tagsArray);
+
+    const tagsData = tagsArray.join(',');
+
+    if (tagsData.length > 1) {
+      url.searchParams.set('tags', tagsData);
+    } else {
+      url.searchParams.delete('tags');
+    }
+
+    window.history.pushState({}, '', url);
+
+    onActiveTagsChange(tagsArray);
+  };
+
+  const activeTagsSet = new Set<string>(activeTags);
 
   return (
     <>
@@ -157,7 +216,8 @@ export default function TagsEditor(props: IProps) {
         <div className={clsx({
           'tagsEditor-create': true,
           disabled: tagInEdit || tagToDelete,
-        })}>
+        })}
+        >
           <input
             type="text"
             className="input tagsEditor-createInput"
@@ -169,7 +229,8 @@ export default function TagsEditor(props: IProps) {
             type="button"
             className="button success tagsEditor-createButton"
             onClick={handleCreateTagClick}
-          >New Tag</button>
+          >New Tag
+          </button>
         </div>
 
         <div className="tagsEditor-list">
@@ -185,7 +246,7 @@ export default function TagsEditor(props: IProps) {
                             className={clsx({
                               'formControl-iconStart tagColorIcon': true,
                               [tagInEdit.color as string]: !tagInEdit.customColor || tagInEdit.customColor === null,
-                              custom: tagInEdit.customColor && tagInEdit.customColor !== null
+                              custom: tagInEdit.customColor && tagInEdit.customColor !== null,
                             })}
                             style={{ '--custom-color': tagInEdit.customColor as string } as React.CSSProperties}
                             onClick={handleColorPickerClick}
@@ -222,20 +283,23 @@ export default function TagsEditor(props: IProps) {
                     />
                   </div>
                 </div>
-              )
+              );
             }
 
             return (
               <div key={tag.id} className="tagsEditor-listItem">
                 <span
+                  onClick={() => handleTagClick(tag.id)}
                   className={clsx({
                     tag: true,
                     [tag.color as string]: !tag.customColor || tag.customColor === null,
                     custom: tag.customColor && tag.customColor !== null,
                     disabled: !!tagInEdit || !!tagToDelete,
+                    isActive: activeTagsSet.has(tag.id),
                   })}
                   style={{ '--custom-color': tag.customColor as string } as React.CSSProperties}
-                >{tag.name}</span>
+                >{tag.name}
+                </span>
 
                 <div className="tagsEditor-listItemControls">
                   {tagToDelete && tagToDelete.id === tag.id ? (
@@ -244,12 +308,14 @@ export default function TagsEditor(props: IProps) {
                         type="button"
                         className="button danger tagsEditor-listItemControlButton"
                         onClick={handleConfirmDeleteClick}
-                      >Delete</button>
+                      >Delete
+                      </button>
                       <button
                         type="button"
                         className="button secondary tagsEditor-listItemControlButton"
                         onClick={handleCancelDeleteClick}
-                      >Cancel</button>
+                      >Cancel
+                      </button>
                     </>
                   ) : (
                     <>
@@ -271,7 +337,7 @@ export default function TagsEditor(props: IProps) {
                   )}
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
@@ -284,10 +350,12 @@ export default function TagsEditor(props: IProps) {
                 className={clsx({
                   tag: true,
                   [selectedColor as string]: selectedCustomColor === null,
-                  custom: selectedCustomColor && selectedCustomColor !== null
+                  custom: selectedCustomColor && selectedCustomColor !== null,
                 })}
-                style={{'--custom-color': selectedCustomColor as string } as React.CSSProperties}
-              >{tagInEdit.name}</span>
+                style={{ '--custom-color': selectedCustomColor as string } as React.CSSProperties}
+              >
+                <span className="tag-name">{tagInEdit.name}</span>
+              </span>
 
               <div className="button primary tagsEditor-moreColorsButton">
                 More colors...
@@ -301,9 +369,10 @@ export default function TagsEditor(props: IProps) {
             </div>
 
             <div className="tagsEditor-colorSwatch">
-            {colorsArray.map((color) => (
+              {colorsArray.map((color) => (
                 <i
-                  role="icon"
+                  role="button"
+                  aria-label="Color Button"
                   key={color}
                   className={`tagsEditor-color color${color}`}
                   onClick={() => handleColorClick(`color${color}`)}
@@ -331,5 +400,5 @@ export default function TagsEditor(props: IProps) {
         </Modal>
       )}
     </>
-  )
-};
+  );
+}

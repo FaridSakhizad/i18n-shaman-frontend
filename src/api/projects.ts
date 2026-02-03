@@ -5,6 +5,7 @@ import {
   IKeyValue,
   IProject, ISearchParams, ITag,
 } from 'interfaces';
+
 import { apiClient } from './client';
 
 interface ICreateProject {
@@ -53,6 +54,7 @@ interface IGetUserProjectById {
   sortBy?: string;
   sortDirection?: string;
   filters?: IFilter | null;
+  tags?: string[];
   search?: string | null;
   searchParams?: ISearchParams | null;
 }
@@ -66,6 +68,7 @@ export const getUserProjectById = async (params: IGetUserProjectById) => {
     sortBy,
     sortDirection = 'asc',
     filters,
+    tags = [],
     search = null,
     searchParams,
   } = params;
@@ -93,6 +96,10 @@ export const getUserProjectById = async (params: IGetUserProjectById) => {
     if (filterQueryString.length > 0) {
       queryString += `&filters=${filterQueryString}`;
     }
+  }
+
+  if (tags && tags.length > 0) {
+    queryString += `&tags=${tags.join(',')}`;
   }
 
   if (search && search.length > 0) {

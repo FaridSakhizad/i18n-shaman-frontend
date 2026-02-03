@@ -31,7 +31,7 @@
   width: 6px;
   height: 11px;
   display: block;
-  background: url("../../assets/images/icon--key-name-arrow.svg") right center no-repeat;
+  background: url("../../../assets/images/icon--key-name-arrow.svg") right center no-repeat;
   cursor: pointer;
   position: absolute;
   top: 18px;
@@ -80,6 +80,14 @@
   align-self: flex-start;
   align-items: flex-start;
   margin-right: 24px;
+
+  .tag {
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
 }
 
 .keyHeader-controls {
@@ -122,7 +130,7 @@
     display: block;
     width: 15px;
     height: 15px;
-    mask: url("../../assets/images/icon--key-01.svg") right center no-repeat;
+    mask: url("../../../assets/images/icon--key-01.svg") right center no-repeat;
     margin: 0 auto 0 auto;
   }
 }
@@ -133,7 +141,7 @@
     display: block;
     width: 11px;
     height: 14px;
-    mask: url("../../assets/images/icon--duplicate.svg") right center no-repeat;
+    mask: url("../../../assets/images/icon--duplicate.svg") right center no-repeat;
     margin: 0 auto 0 auto;
   }
 }
@@ -144,7 +152,7 @@
     display: block;
     width: 15px;
     height: 11px;
-    mask: url("../../assets/images/icon--folder.svg") right center no-repeat;
+    mask: url("../../../assets/images/icon--folder.svg") right center no-repeat;
     margin: 0 auto 0 auto;
   }
 }
@@ -155,7 +163,7 @@
     display: block;
     width: 11px;
     height: 12px;
-    mask: url("../../assets/images/icon--pen.svg") right center no-repeat;
+    mask: url("../../../assets/images/icon--pen.svg") right center no-repeat;
     margin: 0 auto 1px auto;
   }
 }
@@ -166,7 +174,7 @@
     display: block;
     width: 13px;
     height: 11px;
-    mask: url("../../assets/images/icon--move.svg") right center no-repeat;
+    mask: url("../../../assets/images/icon--move.svg") right center no-repeat;
     margin: 0 auto;
   }
 }
@@ -177,7 +185,7 @@
     display: block;
     width: 11px;
     height: 12px;
-    mask: url("../../assets/images/icon--dumpster.svg") right center no-repeat;
+    mask: url("../../../assets/images/icon--dumpster.svg") right center no-repeat;
     margin: 0 auto 1px auto;
   }
 }
@@ -188,7 +196,7 @@
     display: block;
     width: 14px;
     height: 14px;
-    mask: url("../../assets/images/icon--tag.svg") right top no-repeat;
+    mask: url("../../../assets/images/icon--tag.svg") right top no-repeat;
     margin: 0 0 1px 1px;
   }
 }

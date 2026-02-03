@@ -7,7 +7,7 @@ interface IProps {
   anchor: string;
   orientation?: string;
   classNames?: string;
-  onOutsideClick?: () => void | any
+  onOutsideClick?: (e: any) => void | any
   children: React.ReactNode;
 }
 
@@ -67,6 +67,20 @@ export default function Dropdown(props: IProps) {
       setPosition({
         top: anchorBottom,
         left: anchorLeft,
+      });
+    }
+
+    if (orientation === 'tl-br') {
+      setPosition({
+        top: anchorBottom,
+        left: anchorLeft + anchorWidth,
+      });
+    }
+
+    if (orientation === 'tl-tr') {
+      setPosition({
+        top: anchorTop,
+        left: anchorLeft + anchorWidth,
       });
     }
 
@@ -138,7 +152,7 @@ export default function Dropdown(props: IProps) {
     const $dropdown: HTMLElement = dropdownRef.current;
 
     if (!$dropdown.contains(e.target as Node)) {
-      onOutsideClick();
+      onOutsideClick(e);
     }
   };
 
