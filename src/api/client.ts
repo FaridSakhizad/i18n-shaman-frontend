@@ -10,7 +10,9 @@ function genRequestId(): string {
   if (g) {
     const b = g(new Uint8Array(16));
 
+    // eslint-disable-next-line no-bitwise
     b[6] = (b[6] & 0x0f) | 0x40;
+    // eslint-disable-next-line no-bitwise
     b[8] = (b[8] & 0x3f) | 0x80;
 
     // @ts-ignore

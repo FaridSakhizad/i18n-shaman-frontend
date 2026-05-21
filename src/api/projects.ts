@@ -14,13 +14,11 @@ interface ICreateProject {
   projectId: string;
 }
 
-export const createUserProject = async ({ userId, projectName, projectId }: ICreateProject) => {
-  return (await apiClient.post('/createProject', {
-    userId,
-    projectName,
-    projectId,
-  })).data;
-};
+export const createUserProject = async ({ userId, projectName, projectId }: ICreateProject) => (await apiClient.post('/createProject', {
+  userId,
+  projectName,
+  projectId,
+})).data;
 
 export const updateUserProject = async (data: IProject) => {
   try {
@@ -244,11 +242,9 @@ export interface IExportProject {
   format: EExportFormats
 }
 
-export const exportProject = async ({ projectId, format }: IExportProject) => {
-  return apiClient.get(`/exportProject?projectId=${projectId}&format=${format}`, {
-    responseType: 'blob',
-  });
-};
+export const exportProject = async ({ projectId, format }: IExportProject) => apiClient.get(`/exportProject?projectId=${projectId}&format=${format}`, {
+  responseType: 'blob',
+});
 
 export const importDataToProject = async (data: any) => {
   try {

@@ -75,17 +75,15 @@ export default function QuickLanguageAdd(props: IProps) {
 
     setLoading(true);
 
-    const languagesData: IProjectLanguage[] = selectedLanguages.map((language: ILanguage) => {
-      return {
-        baseLanguage: false,
-        visible: true,
-        customLabelEnabled: false,
-        customLabel: '',
-        customCodeEnabled: false,
-        customCode: '',
-        ...language,
-      };
-    });
+    const languagesData: IProjectLanguage[] = selectedLanguages.map((language: ILanguage) => ({
+      baseLanguage: false,
+      visible: true,
+      customLabelEnabled: false,
+      customLabel: '',
+      customCodeEnabled: false,
+      customCode: '',
+      ...language,
+    }));
 
     const resultProject = await addMultipleLanguages({
       languages: languagesData,

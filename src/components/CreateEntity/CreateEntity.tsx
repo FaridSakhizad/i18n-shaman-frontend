@@ -145,7 +145,7 @@ export default function CreateEntity({
       });
     });
 
-    const result = await createProjectEntity({
+    await createProjectEntity({
       projectId,
       parentId,
       id: newKeyId,
@@ -271,7 +271,7 @@ export default function CreateEntity({
                               return (
                                 // eslint-disable-next-line react/no-array-index-key
                                 <td className="targetLanguageSelector-cell" key={`dummy-${cellIdx}`}>
-                                  <span className="targetLanguageSelector-item targetLanguageSelector-item_dummy"/>
+                                  <span className="targetLanguageSelector-item targetLanguageSelector-item_dummy" />
                                 </td>
                               );
                             }

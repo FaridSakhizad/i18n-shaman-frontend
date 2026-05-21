@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'components/Modal';
 import { createProject } from '../../store/projects';
-import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, IRootState } from '../../store';
 
 interface IProps {

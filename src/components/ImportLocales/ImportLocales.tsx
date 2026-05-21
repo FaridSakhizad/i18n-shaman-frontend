@@ -45,9 +45,9 @@ export default function ImportLocales(props: IProps) {
 
   const languagesMap:IUserLanguagesMapItem = generateLanguagesMap(languages);
 
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
-  const [formDataInState, setFormDataInState] = useState(new FormData());
+  const [formDataInState] = useState(new FormData());
 
   const [filesList, setFilesList] = useState<IFileListItem[]>([]);
 
@@ -125,7 +125,7 @@ export default function ImportLocales(props: IProps) {
 
     formDataInState.set('metaData', JSON.stringify(filesList));
 
-    const result = await importDataToProject(formDataInState);
+    await importDataToProject(formDataInState);
 
     setLoading(false);
     onConfirm();

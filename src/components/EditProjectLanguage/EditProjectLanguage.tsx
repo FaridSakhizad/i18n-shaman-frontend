@@ -81,7 +81,7 @@ export default function EditProjectLanguage({
   const handleSaveButtonClick = async () => {
     setLoading(true);
 
-    const result = await updateLanguage({
+    await updateLanguage({
       projectId,
       ...languageInEdit,
     } as IUpdateLanguage);
@@ -124,7 +124,7 @@ export default function EditProjectLanguage({
             <div className="formControl">
               <div className="formControl-header">
                 <label className="formControl-label" htmlFor="custom_code">
-                  Custom language code <i className="formControl-infoIcon"/>
+                  Custom language code <i className="formControl-infoIcon" />
                 </label>
               </div>
               <div className="formControl-body addProjectLang-switchableControl">
@@ -153,7 +153,7 @@ export default function EditProjectLanguage({
             <div className="formControl">
               <div className="formControl-header">
                 <label className="formControl-label" htmlFor="custom_language">
-                  Custom language name <i className="formControl-infoIcon"/>
+                  Custom language name <i className="formControl-infoIcon" />
                 </label>
               </div>
               <div className="formControl-body addProjectLang-switchableControl">

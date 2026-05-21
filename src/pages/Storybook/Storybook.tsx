@@ -16,7 +16,7 @@ export default function Storybook() {
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <input className="input formControl-input"/>
+                <input className="input formControl-input" />
               </div>
             </div>
             <div className="formControl-footer">
@@ -34,9 +34,9 @@ export default function Storybook() {
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <i className="formControl-iconStart formControl-iconKey"/>
-                <i className="formControl-iconEnd formControl-iconEye"/>
-                <input className="input formControl-input"/>
+                <i className="formControl-iconStart formControl-iconKey" />
+                <i className="formControl-iconEnd formControl-iconEye" />
+                <input className="input formControl-input" />
               </div>
             </div>
             <div className="formControl-footer">
@@ -51,11 +51,11 @@ export default function Storybook() {
           <div className="formControl hasError">
             <div className="formControl-header">
               <label className="formControl-label">First Name*</label>
-              <i className="formControl-infoIcon"/>
+              <i className="formControl-infoIcon" />
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <input type="text" className="input formControl-input"/>
+                <input type="text" className="input formControl-input" />
               </div>
             </div>
             <div className="formControl-footer">
@@ -71,11 +71,11 @@ export default function Storybook() {
         <div className="formMk1-row">
           <div className="formControl">
             <div className="formControl-header">
-              <label className="formControl-label">Second Name* <i className="formControl-infoIcon"/></label>
+              <label className="formControl-label">Second Name* <i className="formControl-infoIcon" /></label>
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <input type="text" className="input formControl-input"/>
+                <input type="text" className="input formControl-input" />
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Storybook() {
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <textarea className="textarea formControl-textarea"></textarea>
+                <textarea className="textarea formControl-textarea" />
               </div>
             </div>
             <div className="formControl-footer">
@@ -101,38 +101,38 @@ export default function Storybook() {
         </div>
       </form>
 
-      <hr/>
+      <hr />
 
-      <input type="checkbox" className="switcher"/>
+      <input type="checkbox" className="switcher" />
 
-      <hr/>
+      <hr />
 
       <label className="checkboxControl">
-        <input type="checkbox" className="checkbox"/>
+        <input type="checkbox" className="checkbox" />
         <span className="checkboxControl-text">Checkbox + Label</span>
       </label>
 
-      <hr/>
+      <hr />
 
       <label className="radioControl">
-        <input type="radio" className="radio" name="radio-1"/>
+        <input type="radio" className="radio" name="radio-1" />
         <span className="radioControl-text">Radio + Label</span>
       </label>
-      <br/>
+      <br />
       <label className="radioControl">
-        <input type="radio" className="radio" name="radio-1"/>
+        <input type="radio" className="radio" name="radio-1" />
         <span className="radioControl-text">Radio + Label</span>
       </label>
-      <br/>
+      <br />
       <label className="radioControl">
-        <input type="radio" className="radio" name="radio-1"/>
+        <input type="radio" className="radio" name="radio-1" />
         <span className="radioControl-text">Radio + Label</span>
       </label>
-      <br/>
+      <br />
       <label className="radioControl">
-        <input type="radio" className="radio" name="radio-1"/>
+        <input type="radio" className="radio" name="radio-1" />
         <span className="radioControl-text">Radio + Label</span>
       </label>
     </div>
-  )
+  );
 }

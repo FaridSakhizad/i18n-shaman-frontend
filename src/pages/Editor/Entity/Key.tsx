@@ -5,6 +5,8 @@ import React, {
   useEffect,
 } from 'react';
 
+import clsx from 'clsx';
+
 import {
   EntityType,
   IKeyTag,
@@ -22,7 +24,6 @@ import { IRootState } from 'store';
 import './Key.scss';
 import { ROOT } from '../../../constants/app';
 import { setSelectedEntities } from '../../../store/editorPage';
-import clsx from 'clsx';
 
 interface IProps {
   id: string;
@@ -101,7 +102,7 @@ export default function Key(props: IProps) {
   const handleValueSave = async () => {
     setLoading(true);
 
-    const preparedValues: IKeyValue[] = Object.entries(values).map(([_key, keyValue]) => keyValue);
+    const preparedValues: IKeyValue[] = Object.entries(values).map(([, keyValue]) => keyValue);
 
     const result = await updateKey({
       id,
@@ -270,7 +271,7 @@ export default function Key(props: IProps) {
         </div>
       </div>
       <div className="keyContent">
-        {languages && languages.map((language: IProjectLanguage, idx) => {
+        {languages && languages.map((language: IProjectLanguage) => {
           if (!language.visible) {
             return null;
           }

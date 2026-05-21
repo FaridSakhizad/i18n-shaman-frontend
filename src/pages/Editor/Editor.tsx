@@ -66,7 +66,7 @@ export default function Editor() {
   const initialItemsPerPage = urlSearchParams.get('per_page') ? parseInt(urlSearchParams.get('per_page') as string, 10) : DEFAULT_ITEMS_PER_PAGE;
 
   const [page, setPage] = useState<number>(initialPage);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(initialItemsPerPage);
+  const [itemsPerPage] = useState<number>(initialItemsPerPage);
 
   const initialSortBy = (urlSearchParams.get('sort_by') || ESorting.name) as ESorting;
   const initialSortDirection = (urlSearchParams.get('sort_dir') || 'asc') as ESortDirection;
@@ -173,7 +173,7 @@ export default function Editor() {
 
   const [isLanguagesModalVisible, setIsLanguagesModalVisible] = useState<boolean>(false);
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [, setLoading] = useState<boolean>(false);
 
   const [isAddLanguageModalVisible, setAddLanguageModalVisible] = useState<boolean>(false);
 

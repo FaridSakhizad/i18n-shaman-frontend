@@ -42,7 +42,6 @@ export default function MainLayout({ children }: IProps) {
   }, []);
 
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       <SystemBar />
       <SystemNotifications />

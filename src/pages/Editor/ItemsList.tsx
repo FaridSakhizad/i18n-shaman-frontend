@@ -148,7 +148,7 @@ export default function ItemsList({
 
             <button
               type="button"
-              className={clsx({'pagination-left': true, disabled: page === 0})}
+              className={clsx({ 'pagination-left': true, disabled: page === 0 })}
               aria-label="Previous"
               data-click-target="pagePrev"
             />

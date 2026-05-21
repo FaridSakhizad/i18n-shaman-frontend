@@ -45,11 +45,11 @@ export default function EditEntity({
   const fetchKeyData = async () => {
     const keyData = await getKeyData({ userId: userId as string, projectId: project.projectId, keyId });
 
-    const { key = {}, values = {} } = keyData;
+    const { key: keyInfo = {}, values = {} } = keyData;
 
-    setEntityLabel(key.label);
+    setEntityLabel(keyInfo.label);
 
-    setKey(key);
+    setKey(keyInfo);
     setValues(values[keyId]);
 
     setLoading(false);
@@ -138,7 +138,7 @@ export default function EditEntity({
 
     setLoading(true);
 
-    const keyValuesPrepared = keyValues ? Object.entries(keyValues).map(([_key, keyValue]) => keyValue) : [];
+    const keyValuesPrepared = keyValues ? Object.entries(keyValues).map(([, keyValue]) => keyValue) : [];
 
     const result: IKey | IKeyUpdateError = await updateKey({
       ...key,

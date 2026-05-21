@@ -78,7 +78,7 @@ const userSlice = createAppSlice({
       .addCase(setUserLanguage.pending, (state) => {
         state.loading = true;
       })
-      .addCase(setUserLanguage.fulfilled, (state, action) => {
+      .addCase(setUserLanguage.fulfilled, (state) => {
         state.loading = false;
       })
       .addCase(setUserLanguage.rejected, (state) => {

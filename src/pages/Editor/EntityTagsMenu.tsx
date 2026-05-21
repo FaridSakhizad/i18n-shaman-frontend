@@ -1,13 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { IProject } from '../../interfaces';
 import {
   addTagToEntities,
   assignTagToEntities,
-  deleteTag,
-  detachTagFromEntities
+  detachTagFromEntities,
 } from 'api/projects';
-import { retry } from '@reduxjs/toolkit/query';
 import clsx from 'clsx';
+import { IProject } from '../../interfaces';
 
 interface IProps {
   project: IProject;
@@ -23,6 +21,7 @@ export default function EntityTagsMenu(props: IProps) {
     entityId,
     onCreate = () => {},
     onAttach = () => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onDetach = () => {},
   } = props;
 
@@ -80,7 +79,7 @@ export default function EntityTagsMenu(props: IProps) {
 
     const colorIndex = Math.floor(Math.random() * (24 - 1 + 1) + 1);
 
-    const result = await addTagToEntities({
+    await addTagToEntities({
       projectId: currentProjectId,
       entityIds: [entityId as string],
       tagName: newTagName,
@@ -91,17 +90,17 @@ export default function EntityTagsMenu(props: IProps) {
   };
 
   const handleProjectTagClick = async (id: string) => {
-    const result = await assignTagToEntities({
+    await assignTagToEntities({
       projectId: currentProjectId,
       entityIds: [entityId as string],
-      tagId: id
+      tagId: id,
     });
 
     onAttach();
-  }
+  };
 
   const handleDetachTag = async (id: string) => {
-    const result = await detachTagFromEntities({
+    await detachTagFromEntities({
       projectId: currentProjectId,
       entityIds: [entityId as string],
       tagId: id,
@@ -115,7 +114,7 @@ export default function EntityTagsMenu(props: IProps) {
       return true;
     }
 
-    return !!newTagName && newTagName.length > 0 && (!filteredTagsList || filteredTagsList.length < 1)
+    return !!newTagName && newTagName.length > 0 && (!filteredTagsList || filteredTagsList.length < 1);
   })();
 
   return (
@@ -123,7 +122,7 @@ export default function EntityTagsMenu(props: IProps) {
       {theEntity && theEntity.tags && theEntity.tags.length > 0 && (
         <div className="entityTags">
           <div className="tagsMenu-list">
-            {theEntity.tags.map(({ id: tagId}) => {
+            {theEntity.tags.map(({ id: tagId }) => {
               if (!projectTagsByIdMap.has(tagId)) {
                 return null;
               }
@@ -170,7 +169,8 @@ export default function EntityTagsMenu(props: IProps) {
             className="button success"
             aria-label="Create New Tag"
             onClick={onCreateTagClick}
-          >Create</button>
+          >Create
+          </button>
         )}
       </div>
 
@@ -188,5 +188,5 @@ export default function EntityTagsMenu(props: IProps) {
         </div>
       )}
     </>
-  )
+  );
 }

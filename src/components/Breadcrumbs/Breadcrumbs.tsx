@@ -43,7 +43,7 @@ export default function Breadcrumbs(props: IProps) {
           <Link className="breadcrumbs-link" to={`/project/${project.projectId}/${entity.id}`}>{entity.label}</Link>
         </Fragment>
       ))}
-      <span className="breadcrumbs-separator"/>
+      <span className="breadcrumbs-separator" />
       <span>{subfolder.label}</span>
     </div>
   );

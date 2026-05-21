@@ -112,8 +112,6 @@ export default function ResetPassword() {
 
     if (!validationResult.success) {
       setFormGeneralError(validationResult.errors ? validationResult.errors[0].message : EPasswordValidationErrors.INVALID);
-
-      return;
     }
   };
 
@@ -141,8 +139,6 @@ export default function ResetPassword() {
 
     if (!validationResult.success) {
       setFormGeneralError(validationResult.errors ? validationResult.errors[0].message : EPasswordValidationErrors.INVALID);
-
-      return;
     }
   };
 

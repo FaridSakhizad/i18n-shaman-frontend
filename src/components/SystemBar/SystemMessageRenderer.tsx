@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 
 import {
   EContentType,
-  EMessageType,
   IMessage,
   removeGlobalMessage,
 } from 'store/globalMessages';
@@ -56,7 +55,7 @@ export default function SystemMessageRenderer(props: IMessage) {
 
       <div className="systemMessage-content">
         {(contentType === EContentType.Html) ? (
-          <div dangerouslySetInnerHTML={{__html: content as string }} />
+          <div dangerouslySetInnerHTML={{ __html: content as string }} />
         ) : (
           <>{content}</> // eslint-disable-line react/jsx-no-useless-fragment
         )}

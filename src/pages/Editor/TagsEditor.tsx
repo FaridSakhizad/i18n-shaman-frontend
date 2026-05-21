@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
 
 import { IProject, ITag } from 'interfaces';
@@ -20,10 +19,6 @@ export default function TagsEditor(props: IProps) {
   } = props;
 
   const { tags } = project;
-
-  const useSearchParamsResult = useSearchParams();
-
-  const urlSearchParams = useSearchParamsResult[0];
 
   const [tagsList, setTagsList] = useState<ITag[]>(tags);
 
@@ -64,7 +59,7 @@ export default function TagsEditor(props: IProps) {
 
   const handleTagNameChange = ({ target: { value: name } }: React.ChangeEvent<HTMLInputElement>) => {
     if (!tagInEdit) {
-      return null;
+      return;
     }
 
     setTagInEdit({
@@ -82,7 +77,7 @@ export default function TagsEditor(props: IProps) {
       return;
     }
 
-    const result = await updateTag({
+    await updateTag({
       projectId: project.projectId,
       ...tagInEdit as ITag,
     });
@@ -371,6 +366,7 @@ export default function TagsEditor(props: IProps) {
             <div className="tagsEditor-colorSwatch">
               {colorsArray.map((color) => (
                 <i
+                  tabIndex={0}
                   role="button"
                   aria-label="Color Button"
                   key={color}

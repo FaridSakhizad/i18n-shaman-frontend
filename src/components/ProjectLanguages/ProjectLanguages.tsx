@@ -59,9 +59,7 @@ export default function ProjectLanguages({
       return [];
     }
 
-    return allLanguages.filter(({ code }: ILanguage) => {
-      return languagesMap[code] === undefined;
-    });
+    return allLanguages.filter(({ code }: ILanguage) => languagesMap[code] === undefined);
   };
 
   const [availableLanguagesList, setAvailableLanguagesList] = useState<ILanguage[]>();
@@ -203,17 +201,15 @@ export default function ProjectLanguages({
     setIsQuickAddVisible(true);
     setLoading(true);
 
-    const languagesData: IProjectLanguage[] = selectedLanguages.map((language: ILanguage) => {
-      return {
-        baseLanguage: false,
-        visible: true,
-        customLabelEnabled: false,
-        customLabel: '',
-        customCodeEnabled: false,
-        customCode: '',
-        ...language,
-      };
-    });
+    const languagesData: IProjectLanguage[] = selectedLanguages.map((language: ILanguage) => ({
+      baseLanguage: false,
+      visible: true,
+      customLabelEnabled: false,
+      customLabel: '',
+      customCodeEnabled: false,
+      customCode: '',
+      ...language,
+    }));
 
     const resultProject = await addMultipleLanguages({
       languages: languagesData,
@@ -305,7 +301,7 @@ export default function ProjectLanguages({
     );
   };
 
-  const handleProjectLangsEscapeKeyPress = (e: KeyboardEvent) => {
+  const handleProjectLangsEscapeKeyPress = () => {
     if (!isDeleteConfirmationVisibleRef.current) {
       onClose();
     }

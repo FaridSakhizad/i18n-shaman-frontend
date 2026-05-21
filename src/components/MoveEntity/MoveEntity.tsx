@@ -191,7 +191,7 @@ export default function MoveEntity(props: IProps) {
 
     setLoading(true);
 
-    const result = await moveEntities({
+    await moveEntities({
       projectId,
       userId,
       destinationEntityId: destinationFolderId,
@@ -327,7 +327,7 @@ export default function MoveEntity(props: IProps) {
           </div>
           <div className="modal-content">
             <div className="dialogModal-content">
-            <i className="dialogBadge question danger dialogModal-badge" />
+              <i className="dialogBadge question danger dialogModal-badge" />
               <div className="dialogModal-contentText">
                 <p className="dialogModal-contentPara">Are you sure you want move Selected Entities?</p>
               </div>
