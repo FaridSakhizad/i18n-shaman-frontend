@@ -11,6 +11,7 @@ import {
   getUserProjectById,
   moveEntities,
 } from 'api/projects';
+import { isApiError } from 'api/errors';
 
 import { IRootState } from 'store';
 
@@ -40,7 +41,6 @@ export default function MoveEntity(props: IProps) {
     onConfirm = () => {},
   } = props;
 
-  const { id: userId } = useSelector((state: IRootState) => state.user);
   const { selectedEntities } = useSelector((state: IRootState) => state.editorPage);
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -89,19 +89,19 @@ export default function MoveEntity(props: IProps) {
       subFolderId,
     });
 
+    if (isApiError(result)) {
+      setLoading(false);
+
+      return;
+    }
+
     const children = await getEntitiesChildrenByIds({
       projectId,
-      userId: userId as string,
       ids: result.keys.map((key: IKey) => key.id),
     });
 
     setChildrenByParentIds(getChildrenByParentIds(children));
-
-    if ('error' in result) {
-      console.error(result.message);
-    } else {
-      setProject(result);
-    }
+    setProject(result);
 
     setLoading(false);
   };
@@ -118,19 +118,19 @@ export default function MoveEntity(props: IProps) {
       subFolderId: id,
     });
 
+    if (isApiError(result)) {
+      setLoading(false);
+
+      return;
+    }
+
     const children = await getEntitiesChildrenByIds({
       projectId,
-      userId: userId as string,
       ids: result.keys.map((key: IKey) => key.id),
     });
 
     setChildrenByParentIds(getChildrenByParentIds(children));
-
-    if ('error' in result) {
-      console.error(result.message);
-    } else {
-      setProject(result);
-    }
+    setProject(result);
 
     setDestinationFolderId(undefined);
 
@@ -145,19 +145,19 @@ export default function MoveEntity(props: IProps) {
       subFolderId: project?.subfolder?.parentId,
     });
 
+    if (isApiError(result)) {
+      setLoading(false);
+
+      return;
+    }
+
     const children = await getEntitiesChildrenByIds({
       projectId,
-      userId: userId as string,
       ids: result.keys.map((key: IKey) => key.id),
     });
 
     setChildrenByParentIds(getChildrenByParentIds(children));
-
-    if ('error' in result) {
-      console.error(result.message);
-    } else {
-      setProject(result);
-    }
+    setProject(result);
 
     setDestinationFolderId(undefined);
 
@@ -177,7 +177,7 @@ export default function MoveEntity(props: IProps) {
   };
 
   const handleMoveClick = async () => {
-    if (!userId || !destinationFolderId || !selectedEntities || selectedEntities.length < 1) {
+    if (!destinationFolderId || !selectedEntities || selectedEntities.length < 1) {
       return;
     }
 
@@ -185,7 +185,7 @@ export default function MoveEntity(props: IProps) {
   };
 
   const onMoveConfirmation = async () => {
-    if (!userId || !destinationFolderId || !selectedEntities || selectedEntities.length < 1) {
+    if (!destinationFolderId || !selectedEntities || selectedEntities.length < 1) {
       return;
     }
 
@@ -193,7 +193,6 @@ export default function MoveEntity(props: IProps) {
 
     await moveEntities({
       projectId,
-      userId,
       destinationEntityId: destinationFolderId,
       entityIds: selectedEntities,
     });

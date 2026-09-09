@@ -34,16 +34,15 @@ export const restoreSession = createAsyncThunk(
 );
 
 interface ISetUserLanguageInputArgs {
-  userId: string;
   language: string
 }
 
 export const setUserLanguage = createAsyncThunk(
   'user/setUserLanguage',
   async (data: ISetUserLanguageInputArgs) => {
-    const { userId, language } = data;
+    const { language } = data;
 
-    const res = await setLanguage(userId, language);
+    const res = await setLanguage(language);
 
     return res;
   },

@@ -1,4 +1,5 @@
 import { validateResetToken } from '../../api/user';
+import { isApiError } from '../../api/errors';
 
 export default async function resetPasswordLoader({ params }: any) {
   const { resetToken } = params;
@@ -9,7 +10,7 @@ export default async function resetPasswordLoader({ params }: any) {
 
   const result = await validateResetToken(resetToken as string);
 
-  if (result.errors || !result.success) {
+  if (isApiError(result) || !result.success) {
     window.location.href = '/';
 
     return false;

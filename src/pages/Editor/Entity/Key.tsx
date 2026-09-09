@@ -19,6 +19,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import { updateKey } from 'api/projects';
+import { isApiError } from 'api/errors';
 import { IRootState } from 'store';
 
 import './Key.scss';
@@ -59,7 +60,6 @@ export default function Key(props: IProps) {
   const dispatch = useDispatch();
 
   const { keyValues: valuesFromState } = useSelector((state: IRootState) => state.search);
-  const { id: userId } = useSelector((state: IRootState) => state.user);
 
   const { selectedEntities } = useSelector((state: IRootState) => state.editorPage);
 
@@ -109,12 +109,11 @@ export default function Key(props: IProps) {
       label,
       projectId,
       parentId,
-      userId: userId as string,
       values: preparedValues,
       description,
     });
 
-    if ('error' in result) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
         content: 'Error While Saving Key',
         type: EMessageType.Error,

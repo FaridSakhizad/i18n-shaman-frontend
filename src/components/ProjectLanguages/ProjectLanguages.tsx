@@ -18,6 +18,7 @@ import {
   addMultipleLanguages,
   getAppLanguagesData,
 } from 'api/languages';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import Modal from 'components/Modal';
 import AddLanguageControl from 'components/AddProjectLanguage/AddLanguageControl';
@@ -93,9 +94,9 @@ export default function ProjectLanguages({
 
     const result: IProject | IProjectUpdateError = await setMultipleLanguagesVisibility(project.projectId, visibilityData);
 
-    if ('error' in result) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Error updating All Project Languages visibility',
+        content: getApiErrorMessage(result, 'Error updating All Project Languages visibility'),
         type: EMessageType.Error,
       }));
     } else {
@@ -112,9 +113,9 @@ export default function ProjectLanguages({
 
     const result: IProject | IProjectUpdateError = await setLanguageVisibility(project.projectId, langId, false);
 
-    if ('error' in result) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Error updating Project Language visibility',
+        content: getApiErrorMessage(result, 'Error updating Project Language visibility'),
         type: EMessageType.Error,
       }));
     } else {
@@ -131,9 +132,9 @@ export default function ProjectLanguages({
 
     const result: IProject | IProjectUpdateError = await setLanguageVisibility(project.projectId, langId, true);
 
-    if ('error' in result) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Error updating Project Language information',
+        content: getApiErrorMessage(result, 'Error updating Project Language information'),
         type: EMessageType.Error,
       }));
     } else {
@@ -160,9 +161,9 @@ export default function ProjectLanguages({
 
     const result: IProject | IProjectUpdateError = await deleteLanguage(project.projectId, langId);
 
-    if ('error' in result) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Error Deleting Project Language',
+        content: getApiErrorMessage(result, 'Error Deleting Project Language'),
         type: EMessageType.Error,
       }));
     } else {
@@ -216,9 +217,9 @@ export default function ProjectLanguages({
       projectId: project.projectId,
     });
 
-    if (resultProject.error) {
+    if (isApiError(resultProject)) {
       dispatch(createSystemNotification({
-        content: resultProject.message || 'Error Adding Project Language',
+        content: getApiErrorMessage(resultProject, 'Error Adding Project Language'),
         type: EMessageType.Error,
       }));
     } else {

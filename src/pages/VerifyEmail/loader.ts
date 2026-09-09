@@ -1,4 +1,5 @@
 import { validateVerificationToken } from 'api/user';
+import { isApiError } from 'api/errors';
 
 export default async function verifyEmailLoader({ params }: any) {
   const { verificationToken } = params;
@@ -9,7 +10,7 @@ export default async function verifyEmailLoader({ params }: any) {
 
   const result = await validateVerificationToken(verificationToken as string);
 
-  if (result.errors || !result.success) {
+  if (isApiError(result) || !result.success) {
     // window.location.href = '/';
 
     // return false;

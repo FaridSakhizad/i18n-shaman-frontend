@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Modal from 'components/Modal';
 import { createProject } from '../../store/projects';
-import { AppDispatch, IRootState } from '../../store';
+import { AppDispatch } from '../../store';
 
 interface IProps {
   onClose: () => void;
@@ -15,7 +15,6 @@ export default function CreateProject({
 }: IProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { id: userId } = useSelector((state: IRootState) => state.user);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleCloseButtonClick = () => {
@@ -36,7 +35,6 @@ export default function CreateProject({
     setLoading(true);
 
     dispatch(createProject({
-      userId: userId as string,
       newProjectName,
     }));
 

@@ -28,6 +28,7 @@ import {
   duplicateEntities,
   getUserProjectById,
 } from 'api/projects';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import Header from 'components/Header';
 import { EHeaderModes } from 'components/Header/Header';
@@ -54,7 +55,7 @@ import TagsEditor from './TagsEditor';
 export default function Editor() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { id: userId, preferences } = useSelector((state: IRootState) => state.user);
+  const { preferences } = useSelector((state: IRootState) => state.user);
   const { projectId: currentProjectId = '', subFolderId = '' } = useParams();
   const { selectedEntities } = useSelector((state: IRootState) => state.editorPage);
 
@@ -192,9 +193,7 @@ export default function Editor() {
       searchParams,
     });
 
-    if ('error' in result) {
-      console.error(result.message);
-    } else {
+    if (!isApiError(result)) {
       setProject(result);
     }
 
@@ -202,7 +201,7 @@ export default function Editor() {
   };
 
   useEffect(() => {
-    dispatch(getProjects(userId as string));
+    dispatch(getProjects());
 
     fetchProjectData();
   }, [currentProjectId, subFolderId, page, sorting, filters, tags, searchParams, searchQueryRequest]);
@@ -297,9 +296,9 @@ export default function Editor() {
       entityIds: [id],
     });
 
-    if ('error' in result) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Error Deleting Entity',
+        content: getApiErrorMessage(result, 'Error Deleting Entity'),
         type: EMessageType.Error,
       }));
     } else {
@@ -758,9 +757,9 @@ export default function Editor() {
       entityIds: selectedEntities,
     });
 
-    if ('error' in result) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Error Deleting Entity',
+        content: getApiErrorMessage(result, 'Error Deleting Entity'),
         type: EMessageType.Error,
       }));
     } else {

@@ -1,6 +1,7 @@
 import { IProjectLanguage, IProject, IProjectUpdateError } from 'interfaces';
 
 import { apiClient } from './client';
+import { unwrapApiResponse } from './errors';
 
 interface IAddLanguage {
   projectId: string
@@ -14,16 +15,16 @@ export const addLanguage = async ({
   id,
   label,
   baseLanguage,
-}: IAddLanguage) => apiClient.post('/addLanguage', {
+}: IAddLanguage) => unwrapApiResponse((await apiClient.post('/addLanguage', {
   projectId,
   id,
   label,
   baseLanguage,
-});
+})).data);
 
 export const getAppLanguagesData = async () => {
   try {
-    return (await apiClient.get('/getAppLanguagesData')).data;
+    return unwrapApiResponse((await apiClient.get('/getAppLanguagesData')).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -36,7 +37,7 @@ interface IUpdateMultipleLanguages {
 
 export const addMultipleLanguages = async (data: IUpdateMultipleLanguages) => {
   try {
-    return (await apiClient.post('/addMultipleLanguages', data)).data;
+    return unwrapApiResponse((await apiClient.post('/addMultipleLanguages', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -48,7 +49,7 @@ export interface IUpdateLanguage extends IProjectLanguage {
 
 export const updateLanguage = async (data: IUpdateLanguage) => {
   try {
-    return (await apiClient.post('/updateLanguage', data)).data;
+    return unwrapApiResponse((await apiClient.post('/updateLanguage', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -61,7 +62,7 @@ interface ISetMultipleLanguagesVisibilityItem {
 
 export const setMultipleLanguagesVisibility = async (projectId: string, data: ISetMultipleLanguagesVisibilityItem[]): Promise<IProject | IProjectUpdateError> => {
   try {
-    return (await apiClient.post('/setMultipleLanguagesVisibility', { projectId, data })).data;
+    return unwrapApiResponse((await apiClient.post('/setMultipleLanguagesVisibility', { projectId, data })).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -69,7 +70,7 @@ export const setMultipleLanguagesVisibility = async (projectId: string, data: IS
 
 export const setLanguageVisibility = async (projectId: string, languageId: string, visible: boolean): Promise<IProject | IProjectUpdateError> => {
   try {
-    return (await apiClient.post('/setLanguageVisibility', { projectId, languageId, visible })).data;
+    return unwrapApiResponse((await apiClient.post('/setLanguageVisibility', { projectId, languageId, visible })).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -77,7 +78,7 @@ export const setLanguageVisibility = async (projectId: string, languageId: strin
 
 export const deleteLanguage = async (projectId: string, languageId: string): Promise<IProject | IProjectUpdateError> => {
   try {
-    return (await apiClient.delete(`/deleteLanguage?projectId=${projectId}&languageId=${languageId}`)).data;
+    return unwrapApiResponse((await apiClient.delete(`/deleteLanguage?projectId=${projectId}&languageId=${languageId}`)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -85,7 +86,7 @@ export const deleteLanguage = async (projectId: string, languageId: string): Pro
 
 export const addMultipleRawLanguages = async (data: any[]) => {
   try {
-    return (await apiClient.post('/addMultipleRawLanguages', data)).data;
+    return unwrapApiResponse((await apiClient.post('/addMultipleRawLanguages', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }

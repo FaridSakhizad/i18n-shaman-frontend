@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { unwrapApiResponse } from './errors';
 
 interface ISearchParams {
   projectId: string;
@@ -40,7 +41,7 @@ export const search = async ({
   }
 
   try {
-    return (await apiClient.get(`/search?projectId=${projectId}&query=${query}&case_sensitive=${caseSensitive}&exact=${exact}${extendedParams.length > 0 ? `${extendedParams}` : ''}`)).data;
+    return unwrapApiResponse((await apiClient.get(`/search?projectId=${projectId}&query=${query}&case_sensitive=${caseSensitive}&exact=${exact}${extendedParams.length > 0 ? `${extendedParams}` : ''}`)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }

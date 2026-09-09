@@ -8,6 +8,7 @@ import { createSystemNotification, EMessageType } from 'store/systemNotification
 import { ILanguage, IProjectLanguage, IUserLanguagesMapItem } from 'interfaces';
 import { addMultipleLanguages, getAppLanguagesData } from 'api/languages';
 import { getUserProjectById } from 'api/projects';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import AddLanguageControl from './AddLanguageControl';
 
@@ -40,8 +41,8 @@ export default function AddProjectLanguage({
 
     const languagesMap:IUserLanguagesMapItem = {};
 
-    if (result.error) {
-      alert(result.message);
+    if (isApiError(result)) {
+      alert(getApiErrorMessage(result, 'Error Loading Project Languages'));
     } else {
       result.languages.forEach((language: IProjectLanguage) => {
         languagesMap[language.code] = language;
@@ -131,9 +132,9 @@ export default function AddProjectLanguage({
       projectId,
     });
 
-    if (result.error) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Error Adding Project Language',
+        content: getApiErrorMessage(result, 'Error Adding Project Language'),
         type: EMessageType.Error,
       }));
     } else {

@@ -26,7 +26,7 @@ interface IProps {
 export default function Header(props: IProps) {
   const { mode = EHeaderModes.DEFAULT, project } = props;
 
-  const { id: userId, email } = useSelector((state: IRootState) => state.user);
+  const { email } = useSelector((state: IRootState) => state.user);
 
   const { projectId = '' } = project || {};
 
@@ -53,7 +53,7 @@ export default function Header(props: IProps) {
   };
 
   const handleLogoutClick = async () => {
-    await logout(userId as string);
+    await logout();
 
     window.location.reload();
   };

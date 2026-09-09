@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { unwrapApiResponse } from './errors';
 
 export interface IRegisterUserDto {
   email: string;
@@ -7,10 +8,10 @@ export interface IRegisterUserDto {
 
 export const registerUser = async ({ email, password }: IRegisterUserDto) => {
   try {
-    return (await apiClient.post('auth/register', {
+    return unwrapApiResponse((await apiClient.post('auth/register', {
       email,
       password,
-    })).data;
+    })).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -47,10 +48,10 @@ export interface ILoginUserDto {
 
 export const loginUser = async ({ email, password }: ILoginUserDto) => {
   try {
-    return (await apiClient.post('auth/login', {
+    return unwrapApiResponse((await apiClient.post('auth/login', {
       email,
       password,
-    })).data;
+    })).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -58,15 +59,15 @@ export const loginUser = async ({ email, password }: ILoginUserDto) => {
 
 export const verifyUser = async () => {
   try {
-    return (await apiClient.get('auth/verifyUser')).data;
+    return unwrapApiResponse((await apiClient.get('auth/verifyUser')).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
 };
 
-export const logout = async (userId: string) => {
+export const logout = async () => {
   try {
-    return (await apiClient.post('auth/logout', { userId })).data;
+    return unwrapApiResponse((await apiClient.post('auth/logout')).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -74,7 +75,7 @@ export const logout = async (userId: string) => {
 
 export const resetPasswordRequest = async (email: string) => {
   try {
-    return (await apiClient.get(`auth/resetPasswordRequest?email=${email}`)).data;
+    return unwrapApiResponse((await apiClient.get(`auth/resetPasswordRequest?email=${email}`)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -88,9 +89,9 @@ export const validateResetToken = async (resetToken: string) => {
   }
 };
 
-export const getPasswordResetSecurityToken = async () => {
+export const getPasswordResetSecurityToken = async (resetToken: string) => {
   try {
-    return (await apiClient.get('auth/getPasswordResetSecurityToken')).data;
+    return (await apiClient.post('auth/getPasswordResetSecurityToken', { resetToken })).data;
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -110,16 +111,15 @@ export const setNewPassword = async (data: ISetNewPasswordDto) => {
   }
 };
 
-export const getUpdatePasswordSecurityToken = async (userId: string) => {
+export const getUpdatePasswordSecurityToken = async () => {
   try {
-    return (await apiClient.get(`auth/getUpdatePasswordSecurityToken?userId=${userId}`)).data;
+    return (await apiClient.get('auth/getUpdatePasswordSecurityToken')).data;
   } catch (error: any) {
     return error.response && error.response.data;
   }
 };
 
 export interface IUpdatePasswordDto {
-  userId: string;
   newPassword: string;
   password: string;
   confirmPassword: string;
@@ -127,7 +127,6 @@ export interface IUpdatePasswordDto {
 }
 
 export const updatePassword = async ({
-  userId,
   securityToken,
   password,
   newPassword,
@@ -135,7 +134,6 @@ export const updatePassword = async ({
 }: IUpdatePasswordDto) => {
   try {
     return (await apiClient.post('auth/updatePassword', {
-      userId,
       securityToken,
       password,
       newPassword,
@@ -146,9 +144,9 @@ export const updatePassword = async ({
   }
 };
 
-export const setLanguage = async (userId: string, language: string) => {
+export const setLanguage = async (language: string) => {
   try {
-    return (await apiClient.post('user/setLanguage', { userId, language })).data;
+    return unwrapApiResponse((await apiClient.post('user/setLanguage', { language })).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -158,9 +156,9 @@ interface IUserSettingsPreferencesData {
   projectsOrder: string[]
 }
 
-export const savePreferences = async (userId: string, data: IUserSettingsPreferencesData) => {
+export const savePreferences = async (data: IUserSettingsPreferencesData) => {
   try {
-    return (await apiClient.post('user/savePreferences', { userId, data })).data;
+    return unwrapApiResponse((await apiClient.post('user/savePreferences', { data })).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }

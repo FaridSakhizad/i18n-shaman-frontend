@@ -7,22 +7,21 @@ import {
 } from 'interfaces';
 
 import { apiClient } from './client';
+import { unwrapApiResponse } from './errors';
 
 interface ICreateProject {
-  userId: string;
   projectName: string;
   projectId: string;
 }
 
-export const createUserProject = async ({ userId, projectName, projectId }: ICreateProject) => (await apiClient.post('/createProject', {
-  userId,
+export const createUserProject = async ({ projectName, projectId }: ICreateProject) => unwrapApiResponse((await apiClient.post('/createProject', {
   projectName,
   projectId,
-})).data;
+})).data);
 
 export const updateUserProject = async (data: IProject) => {
   try {
-    return (await apiClient.post('/updateProject', data)).data;
+    return unwrapApiResponse((await apiClient.post('/updateProject', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -30,15 +29,15 @@ export const updateUserProject = async (data: IProject) => {
 
 export const deleteUserProject = async (projectId: string) => {
   try {
-    return (await apiClient.delete(`/deleteProject?projectId=${projectId}`)).data;
+    return unwrapApiResponse((await apiClient.delete(`/deleteProject?projectId=${projectId}`)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
 };
 
-export const getUserProjects = async (userId: string) => {
+export const getUserProjects = async () => {
   try {
-    return (await apiClient.get(`getUserProjects?userId=${userId}`)).data;
+    return unwrapApiResponse((await apiClient.get('getUserProjects')).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -111,7 +110,7 @@ export const getUserProjectById = async (params: IGetUserProjectById) => {
   }
 
   try {
-    return (await apiClient.get(queryString)).data;
+    return unwrapApiResponse((await apiClient.get(queryString)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -128,7 +127,7 @@ interface ICreateEntity {
   type: string;
 }
 
-export const createProjectEntity = async (data: ICreateEntity) => apiClient.post('/createProjectEntity', data);
+export const createProjectEntity = async (data: ICreateEntity) => unwrapApiResponse((await apiClient.post('/createProjectEntity', data)).data);
 
 export interface IDeleteEntitiesRequest {
   projectId: string;
@@ -137,7 +136,7 @@ export interface IDeleteEntitiesRequest {
 
 export const deleteProjectEntities = async (data: IDeleteEntitiesRequest) => {
   try {
-    return (await apiClient.delete('/deleteProjectEntities', { data })).data;
+    return unwrapApiResponse((await apiClient.delete('/deleteProjectEntities', { data })).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -145,7 +144,6 @@ export const deleteProjectEntities = async (data: IDeleteEntitiesRequest) => {
 
 interface IUpdateKey {
   id: string;
-  userId?: string;
   projectId: string;
   parentId: string;
   label: string;
@@ -155,7 +153,7 @@ interface IUpdateKey {
 
 export const updateKey = async (data: IUpdateKey): Promise<IKey | IKeyUpdateError> => {
   try {
-    return (await apiClient.post('/updateKey', data)).data;
+    return unwrapApiResponse((await apiClient.post('/updateKey', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -168,7 +166,7 @@ interface IDuplicateEntities {
 
 export const duplicateEntities = async (data: IDuplicateEntities) => {
   try {
-    return (await apiClient.post('/duplicateEntities', data)).data;
+    return unwrapApiResponse((await apiClient.post('/duplicateEntities', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -176,14 +174,13 @@ export const duplicateEntities = async (data: IDuplicateEntities) => {
 
 interface IMoveEntities {
   projectId: string;
-  userId: string;
   destinationEntityId: string;
   entityIds: string[];
 }
 
 export const moveEntities = async (data: IMoveEntities) => {
   try {
-    return (await apiClient.post('/moveEntities', data)).data;
+    return unwrapApiResponse((await apiClient.post('/moveEntities', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -191,13 +188,12 @@ export const moveEntities = async (data: IMoveEntities) => {
 
 interface IGetKeyData {
   projectId: string;
-  userId: string;
   keyId: string;
 }
 
-export const getKeyData = async ({ userId, projectId, keyId }: IGetKeyData) => {
+export const getKeyData = async ({ projectId, keyId }: IGetKeyData) => {
   try {
-    return (await apiClient.get(`getKeyData?userId=${userId}&projectId=${projectId}&keyId=${keyId}`)).data;
+    return unwrapApiResponse((await apiClient.get(`getKeyData?projectId=${projectId}&keyId=${keyId}`)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -210,7 +206,7 @@ interface IGetMultipleEntitiesDataByParentId {
 
 export const getMultipleEntitiesDataByParentId = async ({ projectId, parentId }: IGetMultipleEntitiesDataByParentId) => {
   try {
-    return (await apiClient.get(`getMultipleEntitiesDataByParentId?projectId=${projectId}&parentId=${parentId}`)).data;
+    return unwrapApiResponse((await apiClient.get(`getMultipleEntitiesDataByParentId?projectId=${projectId}&parentId=${parentId}`)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }
@@ -218,13 +214,12 @@ export const getMultipleEntitiesDataByParentId = async ({ projectId, parentId }:
 
 interface IGetEntitiesChildrenByIds {
   projectId: string,
-  userId: string,
   ids: string[]
 }
 
 export const getEntitiesChildrenByIds = async (data: IGetEntitiesChildrenByIds) => {
   try {
-    return (await apiClient.post('getEntitiesChildrenByIds', data)).data;
+    return unwrapApiResponse((await apiClient.post('getEntitiesChildrenByIds', data)).data);
   } catch (error: any) {
     return error.response && error.response.data;
   }

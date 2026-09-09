@@ -5,13 +5,12 @@ import clsx from 'clsx';
 import { AppDispatch } from 'store';
 import Modal from 'components/Modal';
 import {
-  EStatusCode,
   IError,
   IProject,
   IProjectLanguage,
-  IResponse,
   IUserLanguagesMapItem,
 } from 'interfaces';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import 'components/ImportLocales/ImportLocales.scss';
 import './ImportComponents.scss';
@@ -120,16 +119,21 @@ export default function ImportComponents(props: IProps) {
   const handleImportButtonClick = async () => {
     setLoading(true);
 
-    const result: IResponse | IError = await importComponentsToProject(formDataInState);
+    const result: { success: boolean } | IError = await importComponentsToProject(formDataInState);
 
-    if (result.statusCode === EStatusCode.OK) {
+    if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: result.message || 'Success!',
+        content: getApiErrorMessage(result, 'Error Importing Components'),
+        type: EMessageType.Error,
+      }));
+    } else if (result.success) {
+      dispatch(createSystemNotification({
+        content: 'Success!',
         type: EMessageType.Success,
       }));
     } else {
       dispatch(createSystemNotification({
-        content: result.message || 'Error Importing Components',
+        content: 'Error Importing Components',
         type: EMessageType.Error,
       }));
     }

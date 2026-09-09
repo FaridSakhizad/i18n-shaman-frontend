@@ -34,7 +34,7 @@ import SortableProjectItem from './SortableProjectItem';
 export default function Projects() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { id: userId, preferences } = useSelector((state: IRootState) => state.user);
+  const { preferences } = useSelector((state: IRootState) => state.user);
 
   const { projects } = useSelector((state: IRootState) => state.projects);
 
@@ -131,7 +131,7 @@ export default function Projects() {
   };
 
   useEffect(() => {
-    dispatch(getProjects(userId as string));
+    dispatch(getProjects());
   }, []);
 
   const [projectsOrder, setProjectsOrder] = useState<string[]>(preferences.projectsOrder);
@@ -150,7 +150,7 @@ export default function Projects() {
 
     setProjectsOrder(newOrder);
 
-    await savePreferences(userId as string, { projectsOrder: newOrder });
+    await savePreferences({ projectsOrder: newOrder });
   };
 
   const getOrderedProjects = () => {

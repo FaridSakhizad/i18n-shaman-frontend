@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getEmailVerificationSecurityToken, verifyEmail } from 'api/user';
+import { isApiError } from 'api/errors';
 
 import './VerifyEmail.css';
 
@@ -12,19 +13,13 @@ export default function VerifyEmail() {
   const performVerification = async () => {
     const getSecurityTokenResult = await getEmailVerificationSecurityToken(verificationToken);
 
-    const { success, errors } = getSecurityTokenResult;
-
-    if (!success || errors) {
-      console.error('Error Obtaining Security Token');
-
+    if (isApiError(getSecurityTokenResult) || !getSecurityTokenResult.success) {
       return;
     }
 
     const verificationResult = await verifyEmail(verificationToken, getSecurityTokenResult.data.token);
 
-    if (!verificationResult.success || verificationResult.errors) {
-      console.error('Error Verifying Email');
-
+    if (isApiError(verificationResult) || !verificationResult.success) {
       return;
     }
 

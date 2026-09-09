@@ -21,23 +21,21 @@ const initialState: IInitialState = {
 
 export const getProjects = createAsyncThunk(
   'projects/getProjects',
-  async (userId: string) => {
-    const res = await getUserProjects(userId);
+  async () => {
+    const res = await getUserProjects();
 
     return res;
   },
 );
 
 interface ICreateProjectInputArgs {
-  userId: string;
   newProjectName: string;
 }
 
 export const createProject = createAsyncThunk(
   'projects/createProject',
-  async ({ userId, newProjectName }: ICreateProjectInputArgs) => {
+  async ({ newProjectName }: ICreateProjectInputArgs) => {
     const res = await createUserProject({
-      userId,
       projectName: newProjectName,
       projectId: Math.random().toString(16).substring(2),
     });

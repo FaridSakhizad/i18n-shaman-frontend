@@ -12,6 +12,7 @@ import { ELoginErrorMessageTexts } from 'pages/Auth/Auth';
 
 import './Profile.css';
 import { getUpdatePasswordSecurityToken, updatePassword } from 'api/user';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 interface IPasswordUpdateErrors {
   passwordError?: string;
@@ -20,7 +21,7 @@ interface IPasswordUpdateErrors {
 }
 
 export default function Profile() {
-  const { id: userId, email: userEmail } = useSelector((state: IRootState) => state.user);
+  const { email: userEmail } = useSelector((state: IRootState) => state.user);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -154,26 +155,25 @@ export default function Profile() {
       return;
     }
 
-    const getSecurityTokenResult = await getUpdatePasswordSecurityToken(userId as string);
+    const getSecurityTokenResult = await getUpdatePasswordSecurityToken();
 
-    if (!getSecurityTokenResult.success) {
+    if (isApiError(getSecurityTokenResult) || !getSecurityTokenResult.success) {
       setLoading(false);
-      setPasswordUpdateGeneralError((getSecurityTokenResult.errors && getSecurityTokenResult.errors.length) ? getSecurityTokenResult.errors[0].message : 'Error Updating Password');
+      setPasswordUpdateGeneralError(getApiErrorMessage(getSecurityTokenResult, 'Error Updating Password'));
 
       return;
     }
 
     const updatePasswordResult = await updatePassword({
-      userId: userId as string,
       securityToken: getSecurityTokenResult.data.token,
       password,
       newPassword,
       confirmPassword,
     });
 
-    if (!updatePasswordResult.success) {
+    if (isApiError(updatePasswordResult) || !updatePasswordResult.success) {
       setLoading(false);
-      setPasswordUpdateGeneralError((updatePasswordResult.errors && updatePasswordResult.errors.length) ? updatePasswordResult.errors[0].message : 'Error Updating Password');
+      setPasswordUpdateGeneralError(getApiErrorMessage(updatePasswordResult, 'Error Updating Password'));
 
       return;
     }

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import './ResetPassword.css';
 import { getPasswordResetSecurityToken, setNewPassword } from 'api/user';
+import { getApiErrorMessage, getApiErrorStatus, isApiError } from 'api/errors';
 import { EPasswordValidationErrors, validatePassword } from 'utils/validators';
 import Modal from 'components/Modal';
 
@@ -51,10 +52,10 @@ export default function ResetPassword() {
       return;
     }
 
-    const getSecurityTokenResult = await getPasswordResetSecurityToken();
+    const getSecurityTokenResult = await getPasswordResetSecurityToken(resetToken);
 
-    if (!getSecurityTokenResult.success || getSecurityTokenResult.errors) {
-      setFormGeneralError(getSecurityTokenResult.errors ? getSecurityTokenResult.detail : 'Unknown Error');
+    if (isApiError(getSecurityTokenResult) || !getSecurityTokenResult.success) {
+      setFormGeneralError(getApiErrorMessage(getSecurityTokenResult, 'Unknown Error'));
 
       return;
     }
@@ -67,19 +68,19 @@ export default function ResetPassword() {
       resetToken,
     });
 
-    if (result.success && !result.errors) {
+    if (!isApiError(result) && result.success) {
       setShowResetSuccess(true);
 
       return;
     }
 
-    if (result.status === 403) {
+    if (getApiErrorStatus(result) === 403) {
       window.location.href = '/';
 
       return;
     }
 
-    if (result.status === 406) {
+    if (getApiErrorStatus(result) === 406) {
       setFormGeneralError(EPasswordValidationErrors.INVALID);
 
       return;

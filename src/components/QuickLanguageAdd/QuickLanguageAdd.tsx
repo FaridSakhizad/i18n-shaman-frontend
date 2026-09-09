@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import AddLanguageControl from 'components/AddProjectLanguage/AddLanguageControl';
 import { addMultipleLanguages, getAppLanguagesData } from 'api/languages';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import {
@@ -90,9 +91,9 @@ export default function QuickLanguageAdd(props: IProps) {
       projectId: projectId as string,
     });
 
-    if (resultProject.error) {
+    if (isApiError(resultProject)) {
       dispatch(createSystemNotification({
-        content: resultProject.message || 'Error Adding Project Language',
+        content: getApiErrorMessage(resultProject, 'Error Adding Project Language'),
         type: EMessageType.Error,
       }));
     } else {

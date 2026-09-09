@@ -11,6 +11,7 @@ import {
   registerUser,
   resetPasswordRequest,
 } from 'api/user';
+import { getApiErrorStatus, isApiError } from 'api/errors';
 import { restoreSession } from 'store/user';
 
 import './Auth.scss';
@@ -182,13 +183,12 @@ export default function Auth() {
       return;
     }
 
-    const result: {
-      error: string,
-      statusCode: TErrorCode
-    } = await loginUser({ email: loginEmail as string, password: loginPassword as string });
+    const result = await loginUser({ email: loginEmail as string, password: loginPassword as string });
 
-    if (result.error) {
-      setLoginGeneralError(API_LOGIN_ERROR_MESSAGES[result.statusCode]);
+    if (isApiError(result)) {
+      const errorCode = getApiErrorStatus(result) as TErrorCode;
+
+      setLoginGeneralError(API_LOGIN_ERROR_MESSAGES[errorCode]);
       setLoading(false);
     } else {
       dispatch(restoreSession());
@@ -251,13 +251,10 @@ export default function Auth() {
       return;
     }
 
-    const result: {
-      errors: { [key: string]: string }[],
-      code: TErrorCode
-    } = await registerUser({ email: singUpEmail as string, password: singUpPassword as string });
+    const result = await registerUser({ email: singUpEmail as string, password: singUpPassword as string });
 
-    if (result.errors) {
-      setSingUpGeneralError(API_SIGNUP_ERROR_MESSAGES[result.code]);
+    if (isApiError(result)) {
+      setSingUpGeneralError(API_SIGNUP_ERROR_MESSAGES[getApiErrorStatus(result) as TErrorCode]);
     } else {
       setSingUpSuccess(true);
     }
@@ -330,8 +327,8 @@ export default function Auth() {
 
     const result = await resetPasswordRequest(email);
 
-    if (result.error) {
-      console.error(result.message);
+    if (isApiError(result)) {
+      setLoading(false);
     } else {
       setLoading(false);
       setIsPwdResetRequested(true);

@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-
-import { IRootState } from 'store';
 
 import Modal from 'components/Modal';
 import {
@@ -14,6 +11,7 @@ import {
 
 import { validateKeyName } from 'utils/validators';
 import { getKeyData, updateKey } from 'api/projects';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import './EditEntity.scss';
 
@@ -40,10 +38,8 @@ export default function EditEntity({
   const [entityLabel, setEntityLabel] = useState<string>();
   const [keyValues, setValues] = useState<{ [key: string]: IKeyValue }>({});
 
-  const { id: userId } = useSelector((state: IRootState) => state.user);
-
   const fetchKeyData = async () => {
-    const keyData = await getKeyData({ userId: userId as string, projectId: project.projectId, keyId });
+    const keyData = await getKeyData({ projectId: project.projectId, keyId });
 
     const { key: keyInfo = {}, values = {} } = keyData;
 
@@ -143,12 +139,11 @@ export default function EditEntity({
     const result: IKey | IKeyUpdateError = await updateKey({
       ...key,
       parentId: project.projectId,
-      userId: userId as string,
       values: keyValuesPrepared,
     });
 
-    if ('error' in result) {
-      alert(result.message);
+    if (isApiError(result)) {
+      alert(getApiErrorMessage(result, 'Error While Saving Key'));
     }
 
     setLoading(false);

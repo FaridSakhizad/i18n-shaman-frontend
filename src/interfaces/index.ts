@@ -13,9 +13,13 @@ export interface IResponse {
 }
 
 export interface IError {
-  message: string;
-  error: string;
-  statusCode: number;
+  title: string;
+  status: number;
+  detail?: string;
+  code: string;
+  errors?: Array<{ field: string; message: string; code?: string }>;
+  requestId?: string;
+  timestamp?: string;
 }
 
 export interface IKeyValue {
