@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 
 import Modal from 'components/Modal';
-import { useSelector } from 'react-redux';
-import { IRootState } from 'store';
-import { IProjectLanguage, IUserLanguagesMapItem } from '../../interfaces';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, IRootState } from 'store';
+import { IError, ILanguage, IUserLanguagesMapItem } from '../../interfaces';
 
 import './ImportLocales.scss';
 import AddLanguageControl from '../AddProjectLanguage/AddLanguageControl';
 import { importDataToProject } from '../../api/projects';
+import { createSystemNotification, EMessageType } from '../../store/systemNotifications';
+import { getApiErrorMessage, isApiError } from '../../api/errors';
 
 interface IProps {
   projectId: string;
@@ -31,12 +33,13 @@ export default function ImportLocales(props: IProps) {
     onConfirm,
   } = props;
 
+  const dispatch = useDispatch<AppDispatch>();
   const { languages } = useSelector((state: IRootState) => state.app);
 
-  const generateLanguagesMap = (languagesData: IProjectLanguage[]) => {
+  const generateLanguagesMap = (languagesData: ILanguage[]) => {
     const result:IUserLanguagesMapItem = {};
 
-    languagesData.forEach((language: IProjectLanguage) => {
+    languagesData.forEach((language: ILanguage) => {
       result[language.code] = language;
     });
 
@@ -45,9 +48,9 @@ export default function ImportLocales(props: IProps) {
 
   const languagesMap:IUserLanguagesMapItem = generateLanguagesMap(languages);
 
-  const [, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const [formDataInState] = useState(new FormData());
+  const [formDataInState, setFormDataInState] = useState(new FormData());
 
   const [filesList, setFilesList] = useState<IFileListItem[]>([]);
 
@@ -84,12 +87,21 @@ export default function ImportLocales(props: IProps) {
   };
 
   const handleFileDeleteClick = (index: number) => {
-    const { name } = filesList[index];
+    const newFilesList = [...filesList];
 
-    formDataInState.delete(name);
+    newFilesList.splice(index, 1);
+    setFilesList(newFilesList);
 
-    filesList.splice(index, 1);
-    setFilesList([...filesList]);
+    const newFormData = new FormData();
+    newFormData.set('projectId', projectId as string);
+
+    formDataInState.getAll('files').forEach((file, idx) => {
+      if (idx !== index) {
+        newFormData.append('files', file);
+      }
+    });
+
+    setFormDataInState(newFormData);
   };
 
   const handleCloseButtonClick = () => {
@@ -125,9 +137,24 @@ export default function ImportLocales(props: IProps) {
 
     formDataInState.set('metaData', JSON.stringify(filesList));
 
-    await importDataToProject(formDataInState);
+    const result: { success: boolean } | IError = await importDataToProject(formDataInState);
 
     setLoading(false);
+
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Importing Language Files'),
+        type: EMessageType.Error,
+      }));
+
+      return;
+    }
+
+    dispatch(createSystemNotification({
+      content: 'Language files imported successfully',
+      type: EMessageType.Success,
+    }));
+
     onConfirm();
   };
 
@@ -142,6 +169,10 @@ export default function ImportLocales(props: IProps) {
       customClassNames="modal_withBottomButtons modal_import"
       onEscapeKeyPress={onClose}
     >
+      {loading && (
+        <div className="loading modal-loading" />
+      )}
+
       <div className="modal-header">
         <h4 className="modal-title">Import Language Files to project</h4>
         <button
@@ -205,6 +236,7 @@ export default function ImportLocales(props: IProps) {
           type="button"
           className="button primary"
           onClick={handleImportButtonClick}
+          disabled={filesList.length < 1 || filesList.some((file) => !file.code)}
         >
           Import
         </button>

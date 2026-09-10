@@ -117,6 +117,10 @@ export default function ImportComponents(props: IProps) {
   };
 
   const handleImportButtonClick = async () => {
+    if (loading || !project || filesList.length < 1) {
+      return;
+    }
+
     setLoading(true);
 
     const result: { success: boolean } | IError = await importComponentsToProject(formDataInState);
@@ -126,21 +130,29 @@ export default function ImportComponents(props: IProps) {
         content: getApiErrorMessage(result, 'Error Importing Components'),
         type: EMessageType.Error,
       }));
-    } else if (result.success) {
+      setLoading(false);
+
+      return;
+    }
+
+    if (result.success) {
       dispatch(createSystemNotification({
         content: 'Success!',
         type: EMessageType.Success,
       }));
-    } else {
-      dispatch(createSystemNotification({
-        content: 'Error Importing Components',
-        type: EMessageType.Error,
-      }));
+
+      setLoading(false);
+      onConfirm();
+
+      return;
     }
 
-    setLoading(false);
+    dispatch(createSystemNotification({
+      content: 'Error Importing Components',
+      type: EMessageType.Error,
+    }));
 
-    onConfirm();
+    setLoading(false);
   };
 
   const getLanguageSelectorItems = () => {
@@ -351,6 +363,7 @@ export default function ImportComponents(props: IProps) {
           type="button"
           className="button primary"
           onClick={handleImportButtonClick}
+          disabled={loading || filesList.length < 1}
         >
           Import
         </button>

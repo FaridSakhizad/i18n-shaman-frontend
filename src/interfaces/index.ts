@@ -90,7 +90,7 @@ export interface IProject {
 export interface IProjectUpdateError extends IError {}
 
 export interface IUserLanguagesMapItem {
-  [key: string]: IProjectLanguage;
+  [key: string]: ILanguage | IProjectLanguage;
 }
 
 export enum EntityType {

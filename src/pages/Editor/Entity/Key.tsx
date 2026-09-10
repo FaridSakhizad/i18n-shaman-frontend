@@ -19,7 +19,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import { updateKey } from 'api/projects';
-import { isApiError } from 'api/errors';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 import { IRootState } from 'store';
 
 import './Key.scss';
@@ -100,6 +100,10 @@ export default function Key(props: IProps) {
   };
 
   const handleValueSave = async () => {
+    if (loading) {
+      return;
+    }
+
     setLoading(true);
 
     const preparedValues: IKeyValue[] = Object.entries(values).map(([, keyValue]) => keyValue);
@@ -115,17 +119,20 @@ export default function Key(props: IProps) {
 
     if (isApiError(result)) {
       dispatch(createSystemNotification({
-        content: 'Error While Saving Key',
+        content: getApiErrorMessage(result, 'Error While Saving Key'),
         type: EMessageType.Error,
       }));
-    } else {
-      setValues(result.values);
+      setLoading(false);
 
-      dispatch(createSystemNotification({
-        content: 'Key Saved Successfully',
-        type: EMessageType.Success,
-      }));
+      return;
     }
+
+    setValues(result.values);
+
+    dispatch(createSystemNotification({
+      content: 'Key Saved Successfully',
+      type: EMessageType.Success,
+    }));
 
     setEditValueId('');
     setLoading(false);
@@ -313,6 +320,7 @@ export default function Key(props: IProps) {
                         type="button"
                         className="button primary keyEdit-saveButton"
                         onClick={handleValueSave}
+                        disabled={loading}
                       >
                         Save
                       </button>

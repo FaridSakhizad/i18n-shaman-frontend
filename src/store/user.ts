@@ -51,7 +51,12 @@ export const setUserLanguage = createAsyncThunk(
 const userSlice = createAppSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    clearSession: () => ({
+      ...initialState,
+      loading: false,
+    }),
+  },
   extraReducers: (builder) => {
     builder
       .addCase(restoreSession.pending, (state) => {
@@ -67,7 +72,7 @@ const userSlice = createAppSlice({
         state.loading = false;
         state.id = id;
         state.email = email;
-        state.preferences = preferences || {};
+        state.preferences = preferences || { projectsOrder: [] };
       })
       .addCase(restoreSession.rejected, (state) => {
         state.loading = false;
@@ -85,5 +90,7 @@ const userSlice = createAppSlice({
       });
   },
 });
+
+export const { clearSession } = userSlice.actions;
 
 export default userSlice.reducer;

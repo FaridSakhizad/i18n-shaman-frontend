@@ -9,7 +9,7 @@ interface IProps {
   project: IProject;
   onClose: () => void;
   onCancel: () => void;
-  onSave: (project: IProject) => void;
+  onSave: (project: IProject) => Promise<boolean>;
 }
 
 export default function EditProject({
@@ -37,9 +37,20 @@ export default function EditProject({
     onClose();
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
+    if (loading || project.projectName.trim().length < 1) {
+      return;
+    }
+
     setLoading(true);
-    onSave(project);
+    const saved = await onSave({
+      ...project,
+      projectName: project.projectName.trim(),
+    });
+
+    if (!saved) {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,6 +106,7 @@ export default function EditProject({
           type="button"
           className="button primary modal-button"
           onClick={handleSaveClick}
+          disabled={loading || project.projectName.trim().length < 1}
         >
           Save
         </button>

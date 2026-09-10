@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Modal from 'components/Modal';
 
@@ -11,9 +11,10 @@ import {
   getUserProjectById,
   moveEntities,
 } from 'api/projects';
-import { isApiError } from 'api/errors';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
-import { IRootState } from 'store';
+import { AppDispatch, IRootState } from 'store';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import './MoveEntity.css';
 
@@ -41,6 +42,7 @@ export default function MoveEntity(props: IProps) {
     onConfirm = () => {},
   } = props;
 
+  const dispatch = useDispatch<AppDispatch>();
   const { selectedEntities } = useSelector((state: IRootState) => state.editorPage);
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -90,6 +92,10 @@ export default function MoveEntity(props: IProps) {
     });
 
     if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Loading Project'),
+        type: EMessageType.Error,
+      }));
       setLoading(false);
 
       return;
@@ -99,6 +105,16 @@ export default function MoveEntity(props: IProps) {
       projectId,
       ids: result.keys.map((key: IKey) => key.id),
     });
+
+    if (isApiError(children)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(children, 'Error Loading Child Entities'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
 
     setChildrenByParentIds(getChildrenByParentIds(children));
     setProject(result);
@@ -119,6 +135,10 @@ export default function MoveEntity(props: IProps) {
     });
 
     if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Loading Project'),
+        type: EMessageType.Error,
+      }));
       setLoading(false);
 
       return;
@@ -128,6 +148,16 @@ export default function MoveEntity(props: IProps) {
       projectId,
       ids: result.keys.map((key: IKey) => key.id),
     });
+
+    if (isApiError(children)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(children, 'Error Loading Child Entities'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
 
     setChildrenByParentIds(getChildrenByParentIds(children));
     setProject(result);
@@ -146,6 +176,10 @@ export default function MoveEntity(props: IProps) {
     });
 
     if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Loading Project'),
+        type: EMessageType.Error,
+      }));
       setLoading(false);
 
       return;
@@ -155,6 +189,16 @@ export default function MoveEntity(props: IProps) {
       projectId,
       ids: result.keys.map((key: IKey) => key.id),
     });
+
+    if (isApiError(children)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(children, 'Error Loading Child Entities'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
 
     setChildrenByParentIds(getChildrenByParentIds(children));
     setProject(result);
@@ -191,11 +235,22 @@ export default function MoveEntity(props: IProps) {
 
     setLoading(true);
 
-    await moveEntities({
+    const result = await moveEntities({
       projectId,
       destinationEntityId: destinationFolderId,
       entityIds: selectedEntities,
     });
+
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Moving Entities'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+      setShowConfirmationDialog(false);
+
+      return;
+    }
 
     setLoading(false);
 

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import Modal from 'components/Modal';
 import { IProject } from 'interfaces';
 import { EExportFormats, exportProject, IExportProject } from 'api/projects';
+import { AppDispatch } from 'store';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import './ExportProject.scss';
 import clsx from 'clsx';
@@ -22,6 +25,8 @@ export default function ExportProject(props: IProps) {
     onConfirm,
   } = props;
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const { projectId = '', projectName } = project || {};
 
   const [loading, setLoading] = useState(false);
@@ -40,34 +45,42 @@ export default function ExportProject(props: IProps) {
   };
 
   const handleExportButtonClick = async () => {
-    setLoading(true);
-
-    if (!project || !exportFormat) {
+    if (!project || !exportFormat || loading) {
       return;
     }
+
+    setLoading(true);
 
     const exportSettings: IExportProject = {
       projectId,
       format: exportFormat,
     };
 
-    const response = await exportProject(exportSettings);
+    try {
+      const response = await exportProject(exportSettings);
 
-    const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([response.data]));
 
-    const $link = document.createElement('a');
-    $link.href = url;
-    $link.download = `${projectName}.zip`;
+      const $link = document.createElement('a');
+      $link.href = url;
+      $link.download = `${projectName}.zip`;
 
-    document.body.appendChild($link);
+      document.body.appendChild($link);
 
-    $link.click();
-    $link.remove();
+      $link.click();
+      $link.remove();
 
-    window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(url);
+
+      onConfirm();
+    } catch {
+      dispatch(createSystemNotification({
+        content: 'Error Exporting Project',
+        type: EMessageType.Error,
+      }));
+    }
 
     setLoading(false);
-    onConfirm();
   };
 
   return (
@@ -127,7 +140,7 @@ export default function ExportProject(props: IProps) {
           type="button"
           className="button modal-button primary"
           onClick={handleExportButtonClick}
-          disabled={!exportFormat}
+          disabled={loading || !exportFormat}
         >
           Export
         </button>

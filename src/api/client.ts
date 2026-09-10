@@ -1,5 +1,7 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { IError } from 'interfaces';
 import getAppConfig from '../config/appConfig';
+import { IApiResponse, isApiError } from './errors';
 
 const { API_URL } = getAppConfig();
 
@@ -27,6 +29,64 @@ export const apiClient = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
+
+function getErrorResponse(error: unknown): IError {
+  if (axios.isAxiosError(error) && error.response?.data) {
+    return error.response.data as IError;
+  }
+
+  return error as IError;
+}
+
+export async function requestEnvelope<T>(
+  request: Promise<AxiosResponse<IApiResponse<T>>>,
+): Promise<IApiResponse<T> | IError> {
+  try {
+    const response = await request;
+
+    return response.data;
+  } catch (error: unknown) {
+    return getErrorResponse(error);
+  }
+}
+
+export async function requestPayload<T>(
+  request: Promise<AxiosResponse<IApiResponse<T>>>,
+): Promise<T> {
+  const result = await requestEnvelope<T>(request);
+
+  if (isApiError(result)) {
+    return result as T;
+  }
+
+  return result.data;
+}
+
+type QueryValue = string | number | boolean | Array<string | number | boolean> | null | undefined;
+
+export function buildQueryString(path: string, params: Record<string, QueryValue>): string {
+  const query = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') {
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        query.set(key, value.join(','));
+      }
+
+      return;
+    }
+
+    query.set(key, String(value));
+  });
+
+  const serializedQuery = query.toString();
+
+  return serializedQuery ? `${path}?${serializedQuery}` : path;
+}
 
 apiClient.interceptors.request.use((config) => {
   const HEADER = 'X-Request-ID';

@@ -5,6 +5,7 @@ import { IProject, ITag } from 'interfaces';
 
 import './TagsEditor.css';
 import { createTag, deleteTag, updateTag } from '../../api/projects';
+import { isApiError } from '../../api/errors';
 import Modal from '../../components/Modal';
 
 interface IProps {
@@ -43,6 +44,10 @@ export default function TagsEditor(props: IProps) {
     });
 
     setNewTagName(null);
+
+    if (isApiError(result)) {
+      return;
+    }
 
     const { data } = result;
 
@@ -149,6 +154,10 @@ export default function TagsEditor(props: IProps) {
     });
 
     setTagToDelete(null);
+
+    if (isApiError(result)) {
+      return;
+    }
 
     const { data } = result;
 

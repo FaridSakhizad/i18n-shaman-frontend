@@ -11,7 +11,7 @@ import {
   registerUser,
   resetPasswordRequest,
 } from 'api/user';
-import { getApiErrorStatus, isApiError } from 'api/errors';
+import { getApiErrorMessage, getApiErrorStatus, isApiError } from 'api/errors';
 import { restoreSession } from 'store/user';
 
 import './Auth.scss';
@@ -124,7 +124,7 @@ export default function Auth() {
   const [singUpAttemptMade, setSingUpAttemptMade] = useState<boolean>(false);
   const [loginAttemptMade, setLoginAttemptMade] = useState<boolean>(false);
 
-  const [loginGeneralError, setLoginGeneralError] = useState<EApiLoginErrorMessageTexts | null>(null);
+  const [loginGeneralError, setLoginGeneralError] = useState<string | null>(null);
   const [loginErrors, setLoginErrors] = useState<ILoginErrors | null>(null);
 
   const [loginEmail, setLoginEmail] = useState<string | null>('');
@@ -159,6 +159,10 @@ export default function Auth() {
     e.preventDefault();
     e.stopPropagation();
 
+    if (loading) {
+      return;
+    }
+
     setLoginAttemptMade(true);
 
     setLoading(true);
@@ -188,7 +192,7 @@ export default function Auth() {
     if (isApiError(result)) {
       const errorCode = getApiErrorStatus(result) as TErrorCode;
 
-      setLoginGeneralError(API_LOGIN_ERROR_MESSAGES[errorCode]);
+      setLoginGeneralError(getApiErrorMessage(result, API_LOGIN_ERROR_MESSAGES[errorCode]));
       setLoading(false);
     } else {
       dispatch(restoreSession());
@@ -199,7 +203,7 @@ export default function Auth() {
   const [singUpEmail, setSingUpEmail] = useState<string | null>('');
   const [singUpPassword, setSingUpPassword] = useState<string | null>('');
 
-  const [singUpGeneralError, setSingUpGeneralError] = useState<EApiSignupErrorMessageTexts | null>(null);
+  const [singUpGeneralError, setSingUpGeneralError] = useState<string | null>(null);
   const [singUpErrors, setSingUpErrors] = useState<ISignupErrors | null>(null);
 
   const [singUpSuccess, setSingUpSuccess] = useState<boolean>(false);
@@ -207,6 +211,10 @@ export default function Auth() {
   const handleRegisterFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (loading) {
+      return;
+    }
 
     setSingUpAttemptMade(true);
 
@@ -254,7 +262,9 @@ export default function Auth() {
     const result = await registerUser({ email: singUpEmail as string, password: singUpPassword as string });
 
     if (isApiError(result)) {
-      setSingUpGeneralError(API_SIGNUP_ERROR_MESSAGES[getApiErrorStatus(result) as TErrorCode]);
+      const errorCode = getApiErrorStatus(result) as TErrorCode;
+
+      setSingUpGeneralError(getApiErrorMessage(result, API_SIGNUP_ERROR_MESSAGES[errorCode]));
     } else {
       setSingUpSuccess(true);
     }
@@ -316,10 +326,17 @@ export default function Auth() {
 
   const [isResetPwdModalVisible, setIsResetPwdModalVisible] = useState<boolean>(false);
   const [isPwdResetRequested, setIsPwdResetRequested] = useState(false);
+  const [resetPwdGeneralError, setResetPwdGeneralError] = useState<string | null>(null);
 
   const handleResetPasswordFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
     setLoading(true);
+    setResetPwdGeneralError(null);
 
     const formData = new FormData(e.target as HTMLFormElement);
 
@@ -328,6 +345,7 @@ export default function Auth() {
     const result = await resetPasswordRequest(email);
 
     if (isApiError(result)) {
+      setResetPwdGeneralError(getApiErrorMessage(result, 'Password reset request failed'));
       setLoading(false);
     } else {
       setLoading(false);
@@ -336,14 +354,17 @@ export default function Auth() {
   };
 
   const handleResetPwdClick = () => {
+    setResetPwdGeneralError(null);
     setIsResetPwdModalVisible(true);
   };
 
   const handleCloseResetPwdClick = () => {
+    setResetPwdGeneralError(null);
     setIsResetPwdModalVisible(false);
   };
 
   const handleCloseResetPwdConfirmationClick = () => {
+    setResetPwdGeneralError(null);
     setIsPwdResetRequested(false);
     setIsResetPwdModalVisible(false);
   };
@@ -362,12 +383,13 @@ export default function Auth() {
           <h2 className="h2 modal-title success">Registration Successful</h2>
         </div>
         <div className="modal-content">
+          <p>Please check your email and follow the verification link before logging in.</p>
           <button
             type="button"
             className="button success signupSuccess-loginButton"
             onClick={handleLoginToSiteClick}
           >
-            Login to Website
+            Back to Login
           </button>
         </div>
       </Modal>
@@ -413,6 +435,11 @@ export default function Auth() {
               <div className="modal-content">
                 <div className="resetPwdFormBox">
                   <form className="formMk1 resetPwdForm" onSubmit={handleResetPasswordFormSubmit}>
+                    {resetPwdGeneralError && (
+                      <div className="formMk1-error">
+                        {resetPwdGeneralError}
+                      </div>
+                    )}
 
                     <div className="formMk1-row">
                       <div className="formControl">
@@ -432,7 +459,13 @@ export default function Auth() {
                     </div>
 
                     <div className="formMk1-row authForm-row_controls">
-                      <button type="submit" className="button primary resetPwdForm-buttonSend">Reset Password</button>
+                      <button
+                        type="submit"
+                        className="button primary resetPwdForm-buttonSend"
+                        disabled={loading}
+                      >
+                        Reset Password
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -514,7 +547,13 @@ export default function Auth() {
                     </div>
                   </div>
                   <div className="formMk1-row authForm-row_controls">
-                    <button type="submit" className="button primary authForm-loginButton">Login</button>
+                    <button
+                      type="submit"
+                      className="button primary authForm-loginButton"
+                      disabled={loading}
+                    >
+                      Login
+                    </button>
                   </div>
                 </form>
 
@@ -606,7 +645,13 @@ export default function Auth() {
                   </div>
                 </div>
                 <div className="formMk1-row authForm-row_controls">
-                  <button type="submit" className="button success authForm-loginButton">Register</button>
+                  <button
+                    type="submit"
+                    className="button success authForm-loginButton"
+                    disabled={loading}
+                  >
+                    Register
+                  </button>
                 </div>
               </form>
 

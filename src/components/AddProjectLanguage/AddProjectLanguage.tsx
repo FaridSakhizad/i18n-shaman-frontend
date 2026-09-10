@@ -30,7 +30,7 @@ export default function AddProjectLanguage({
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [fullLanguagesList, setFullLanguagesList] = useState<IProjectLanguage[]>([]);
+  const [fullLanguagesList, setFullLanguagesList] = useState<ILanguage[]>([]);
 
   const [selectedLanguages, setSelectedLanguages] = useState<IProjectLanguage[]>([]);
 
@@ -42,13 +42,21 @@ export default function AddProjectLanguage({
     const languagesMap:IUserLanguagesMapItem = {};
 
     if (isApiError(result)) {
-      alert(getApiErrorMessage(result, 'Error Loading Project Languages'));
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Loading Project Languages'),
+        type: EMessageType.Error,
+      }));
+    } else if (isApiError(languages)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(languages, 'Error Loading Languages'),
+        type: EMessageType.Error,
+      }));
     } else {
       result.languages.forEach((language: IProjectLanguage) => {
         languagesMap[language.code] = language;
       });
 
-      const availableLanguages = languages.filter(({ code }: IProjectLanguage) => languagesMap[code] === undefined);
+      const availableLanguages = languages.filter(({ code }: ILanguage) => languagesMap[code] === undefined);
 
       setFullLanguagesList(availableLanguages);
     }

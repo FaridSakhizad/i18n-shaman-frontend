@@ -8,31 +8,47 @@ import './VerifyEmail.css';
 export default function VerifyEmail() {
   const { verificationToken = '' } = useParams<{ verificationToken: string }>();
 
+  const [loading, setLoading] = useState(true);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
 
   const performVerification = async () => {
     const getSecurityTokenResult = await getEmailVerificationSecurityToken(verificationToken);
 
     if (isApiError(getSecurityTokenResult) || !getSecurityTokenResult.success) {
+      setLoading(false);
+
       return;
     }
 
     const verificationResult = await verifyEmail(verificationToken, getSecurityTokenResult.data.token);
 
     if (isApiError(verificationResult) || !verificationResult.success) {
+      setLoading(false);
+
       return;
     }
 
     setVerificationSuccess(true);
+    setLoading(false);
   };
 
   useEffect(() => {
     if (!verificationToken || verificationToken.length < 1) {
+      setLoading(false);
+
       return;
     }
 
     performVerification();
-  }, [verificationSuccess]);
+  }, [verificationToken]);
+
+  if (loading) {
+    return (
+      <div className="verifyEmail">
+        <div className="loading" />
+      </div>
+    );
+  }
 
   if (!verificationSuccess) {
     return (

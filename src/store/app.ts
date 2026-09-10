@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getAppLanguagesData } from 'api/languages';
+import { ILanguage } from 'interfaces';
 
 interface IInitialState {
   loading: boolean;
-  languages: [],
+  languages: ILanguage[],
 }
 
 const initialState: IInitialState = {

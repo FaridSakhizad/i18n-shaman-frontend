@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { IRootState } from 'store';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, IRootState } from 'store';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { logout } from 'api/user';
 import { IProject } from 'interfaces';
+import { clearSession } from 'store/user';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import Dropdown from '../Dropdown';
 import ImportLocales from '../ImportLocales';
@@ -24,6 +27,8 @@ interface IProps {
 }
 
 export default function Header(props: IProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { mode = EHeaderModes.DEFAULT, project } = props;
 
   const { email } = useSelector((state: IRootState) => state.user);
@@ -53,9 +58,19 @@ export default function Header(props: IProps) {
   };
 
   const handleLogoutClick = async () => {
-    await logout();
+    const result = await logout();
 
-    window.location.reload();
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Logging Out'),
+        type: EMessageType.Error,
+      }));
+
+      return;
+    }
+
+    dispatch(clearSession());
+    navigate('/auth');
   };
 
   return (

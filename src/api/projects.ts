@@ -6,42 +6,57 @@ import {
   IProject, ISearchParams, ITag,
 } from 'interfaces';
 
-import { apiClient } from './client';
-import { unwrapApiResponse } from './errors';
+import {
+  apiClient,
+  buildQueryString,
+  requestEnvelope,
+  requestPayload,
+} from './client';
 
 interface ICreateProject {
   projectName: string;
   projectId: string;
 }
 
-export const createUserProject = async ({ projectName, projectId }: ICreateProject) => unwrapApiResponse((await apiClient.post('/createProject', {
+interface IImportResult {
+  addProjectLanguagesResult: unknown;
+  createDocumentsResult: unknown;
+  createValuesResult: unknown;
+}
+
+interface ITagListResponse {
+  tags: ITag[];
+}
+
+interface IEntitiesResponse {
+  entities: IKey[];
+}
+
+interface IOkResponse {
+  ok: string;
+}
+
+interface IKeyDataResponse {
+  key: IKey;
+  values: {
+    [key: string]: {
+      [key: string]: IKeyValue;
+    };
+  };
+}
+
+export const createUserProject = async ({ projectName, projectId }: ICreateProject) => requestPayload<IProject[]>(apiClient.post('/createProject', {
   projectName,
   projectId,
-})).data);
+}));
 
-export const updateUserProject = async (data: IProject) => {
-  try {
-    return unwrapApiResponse((await apiClient.post('/updateProject', data)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const updateUserProject = async (data: IProject) => requestPayload<IProject>(apiClient.post('/updateProject', data));
 
-export const deleteUserProject = async (projectId: string) => {
-  try {
-    return unwrapApiResponse((await apiClient.delete(`/deleteProject?projectId=${projectId}`)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const deleteUserProject = async (projectId: string) => requestPayload<IProject[]>(apiClient.delete('/deleteProject', {
+  data: { projectId },
+}));
 
-export const getUserProjects = async () => {
-  try {
-    return unwrapApiResponse((await apiClient.get('getUserProjects')).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const getUserProjects = async () => requestPayload<IProject[]>(apiClient.get('getUserProjects'));
 
 interface IGetUserProjectById {
   projectId: string;
@@ -70,50 +85,27 @@ export const getUserProjectById = async (params: IGetUserProjectById) => {
     searchParams,
   } = params;
 
-  let queryString = `getUserProjectById?projectId=${projectId}`;
+  const filtersToQueryString = filters && Object.entries(filters).length > 0
+    ? Object.entries(filters).filter(([,value]) => value).map(([filter]) => filter)
+    : [];
+  const searchParamsToQueryString = searchParams && Object.entries(searchParams).length > 0
+    ? Object.entries(searchParams).filter(([,value]) => value).map(([value]) => value)
+    : [];
 
-  if (subFolderId) {
-    queryString += `&subFolderId=${subFolderId}`;
-  }
+  const queryString = buildQueryString('getUserProjectById', {
+    projectId,
+    subFolderId,
+    page,
+    itemsPerPage,
+    sortBy,
+    sortDirection,
+    filters: filtersToQueryString,
+    tags,
+    search,
+    searchParams: search && search.length > 0 ? searchParamsToQueryString : [],
+  });
 
-  queryString += `&page=${page}`;
-  queryString += `&itemsPerPage=${itemsPerPage}`;
-
-  if (sortBy) {
-    queryString += `&sortBy=${sortBy}`;
-
-    if (sortDirection) {
-      queryString += `&sortDirection=${sortDirection}`;
-    }
-  }
-
-  if (filters && Object.entries(filters).length > 0) {
-    const filterQueryString = Object.entries(filters).filter(([,value]) => value).map(([filter]) => filter).join(',');
-
-    if (filterQueryString.length > 0) {
-      queryString += `&filters=${filterQueryString}`;
-    }
-  }
-
-  if (tags && tags.length > 0) {
-    queryString += `&tags=${tags.join(',')}`;
-  }
-
-  if (search && search.length > 0) {
-    queryString += `&search=${encodeURIComponent(search)}`;
-
-    if (searchParams && Object.entries(searchParams).length > 0) {
-      const searchParamsString = Object.entries(searchParams).filter(([,value]) => value).map(([value]) => value).join(',');
-
-      queryString += `&search_params=${searchParamsString}`;
-    }
-  }
-
-  try {
-    return unwrapApiResponse((await apiClient.get(queryString)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
+  return requestPayload<IProject>(apiClient.get(queryString));
 };
 
 interface ICreateEntity {
@@ -127,20 +119,14 @@ interface ICreateEntity {
   type: string;
 }
 
-export const createProjectEntity = async (data: ICreateEntity) => unwrapApiResponse((await apiClient.post('/createProjectEntity', data)).data);
+export const createProjectEntity = async (data: ICreateEntity) => requestPayload<IKey>(apiClient.post('/createProjectEntity', data));
 
 export interface IDeleteEntitiesRequest {
   projectId: string;
   entityIds: string[]
 }
 
-export const deleteProjectEntities = async (data: IDeleteEntitiesRequest) => {
-  try {
-    return unwrapApiResponse((await apiClient.delete('/deleteProjectEntities', { data })).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const deleteProjectEntities = async (data: IDeleteEntitiesRequest) => requestPayload<IKey[]>(apiClient.delete('/deleteProjectEntities', { data }));
 
 interface IUpdateKey {
   id: string;
@@ -151,26 +137,14 @@ interface IUpdateKey {
   description: string;
 }
 
-export const updateKey = async (data: IUpdateKey): Promise<IKey | IKeyUpdateError> => {
-  try {
-    return unwrapApiResponse((await apiClient.post('/updateKey', data)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const updateKey = async (data: IUpdateKey): Promise<IKey | IKeyUpdateError> => requestPayload<IKey | IKeyUpdateError>(apiClient.post('/updateKey', data));
 
 interface IDuplicateEntities {
   projectId: string;
   entityIds: string[];
 }
 
-export const duplicateEntities = async (data: IDuplicateEntities) => {
-  try {
-    return unwrapApiResponse((await apiClient.post('/duplicateEntities', data)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const duplicateEntities = async (data: IDuplicateEntities) => requestPayload<IKey[]>(apiClient.post('/duplicateEntities', data));
 
 interface IMoveEntities {
   projectId: string;
@@ -178,58 +152,39 @@ interface IMoveEntities {
   entityIds: string[];
 }
 
-export const moveEntities = async (data: IMoveEntities) => {
-  try {
-    return unwrapApiResponse((await apiClient.post('/moveEntities', data)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const moveEntities = async (data: IMoveEntities) => requestPayload<IKey[]>(apiClient.post('/moveEntities', data));
 
 interface IGetKeyData {
   projectId: string;
   keyId: string;
 }
 
-export const getKeyData = async ({ projectId, keyId }: IGetKeyData) => {
-  try {
-    return unwrapApiResponse((await apiClient.get(`getKeyData?projectId=${projectId}&keyId=${keyId}`)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const getKeyData = async ({ projectId, keyId }: IGetKeyData) => requestPayload<IKeyDataResponse>(apiClient.get(buildQueryString('getKeyData', {
+  projectId,
+  keyId,
+})));
 
 interface IGetMultipleEntitiesDataByParentId {
   projectId: string;
   parentId: string;
 }
 
-export const getMultipleEntitiesDataByParentId = async ({ projectId, parentId }: IGetMultipleEntitiesDataByParentId) => {
-  try {
-    return unwrapApiResponse((await apiClient.get(`getMultipleEntitiesDataByParentId?projectId=${projectId}&parentId=${parentId}`)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const getMultipleEntitiesDataByParentId = async ({ projectId, parentId }: IGetMultipleEntitiesDataByParentId) => requestPayload<IKey[]>(apiClient.get(buildQueryString('getMultipleEntitiesDataByParentId', {
+  projectId,
+  parentId,
+})));
 
 interface IGetEntitiesChildrenByIds {
   projectId: string,
   ids: string[]
 }
 
-export const getEntitiesChildrenByIds = async (data: IGetEntitiesChildrenByIds) => {
-  try {
-    return unwrapApiResponse((await apiClient.post('getEntitiesChildrenByIds', data)).data);
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const getEntitiesChildrenByIds = async (data: IGetEntitiesChildrenByIds) => requestPayload<IKey[]>(apiClient.post('getEntitiesChildrenByIds', data));
 
 export enum EExportFormats {
   json = 'json',
   androidXml = 'android_xml',
   appleStrings = 'apple_string',
-  phpArray = 'php_array',
 }
 
 export interface IExportProject {
@@ -237,38 +192,23 @@ export interface IExportProject {
   format: EExportFormats
 }
 
-export const exportProject = async ({ projectId, format }: IExportProject) => apiClient.get(`/exportProject?projectId=${projectId}&format=${format}`, {
+export const exportProject = async ({ projectId, format }: IExportProject) => apiClient.get(buildQueryString('/exportProject', {
+  projectId,
+  format,
+}), {
   responseType: 'blob',
 });
 
-export const importDataToProject = async (data: any) => {
-  try {
-    return (await apiClient.post('importJsonDataToProject', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const importDataToProject = async (data: FormData) => requestEnvelope<IImportResult>(apiClient.post('importJsonDataToProject', data));
 
-export const importComponentsToProject = async (data: any) => {
-  try {
-    return (await apiClient.post('importComponentsDataToProject', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const importComponentsToProject = async (data: FormData) => requestEnvelope<IImportResult>(apiClient.post('importComponentsDataToProject', data));
 
 export interface ICreateTag {
   projectId: string;
   tagName: string;
 }
 
-export const createTag = async (data: ICreateTag) => {
-  try {
-    return (await apiClient.post('createTag', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const createTag = async (data: ICreateTag) => requestEnvelope<ITagListResponse>(apiClient.post('createTag', data));
 
 export interface IAddTagToEntities {
   projectId: string;
@@ -277,13 +217,7 @@ export interface IAddTagToEntities {
   color: string;
 }
 
-export const addTagToEntities = async (data: IAddTagToEntities) => {
-  try {
-    return (await apiClient.post('addTagsToEntities', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const addTagToEntities = async (data: IAddTagToEntities) => requestEnvelope<ITagListResponse>(apiClient.post('addTagsToEntities', data));
 
 export interface IAssignTagToEntities {
   projectId: string;
@@ -291,43 +225,19 @@ export interface IAssignTagToEntities {
   tagId: string;
 }
 
-export const assignTagToEntities = async (data: IAssignTagToEntities) => {
-  try {
-    return (await apiClient.post('assignTagToEntities', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const assignTagToEntities = async (data: IAssignTagToEntities) => requestEnvelope<IEntitiesResponse>(apiClient.post('assignTagToEntities', data));
 
-export const detachTagFromEntities = async (data: IAssignTagToEntities) => {
-  try {
-    return (await apiClient.post('detachTagFromEntities', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const detachTagFromEntities = async (data: IAssignTagToEntities) => requestEnvelope<IEntitiesResponse>(apiClient.post('detachTagFromEntities', data));
 
 export interface IDeleteTag {
   projectId: string;
   tagId: string;
 }
 
-export const deleteTag = async (data: IDeleteTag) => {
-  try {
-    return (await apiClient.post('deleteTag', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const deleteTag = async (data: IDeleteTag) => requestEnvelope<ITagListResponse>(apiClient.post('deleteTag', data));
 
 export interface IUpdateTag extends ITag {
   projectId: string;
 }
 
-export const updateTag = async (data: IUpdateTag) => {
-  try {
-    return (await apiClient.post('updateTag', data)).data;
-  } catch (error: any) {
-    return error.response && error.response.data;
-  }
-};
+export const updateTag = async (data: IUpdateTag) => requestEnvelope<IOkResponse>(apiClient.post('updateTag', data));

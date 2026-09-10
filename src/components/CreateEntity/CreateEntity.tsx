@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import Modal from 'components/Modal';
 
@@ -11,6 +12,8 @@ import {
 } from 'interfaces';
 
 import { validateKeyName } from 'utils/validators';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import './CreateEntity.scss';
 
@@ -37,6 +40,8 @@ export default function CreateEntity({
   onConfirm,
   onClose,
 }: IPros) {
+  const dispatch = useDispatch();
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const [keyName, setName] = useState<string>('');
@@ -62,7 +67,7 @@ export default function CreateEntity({
   const [keyNameError, setKeyNameError] = useState<string>('');
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!project) {
+    if (!project || loading) {
       return;
     }
 
@@ -121,6 +126,16 @@ export default function CreateEntity({
       parentId,
     });
 
+    if (isApiError(siblingKeysData)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(siblingKeysData, 'Error Loading Sibling Entities'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
+
     setSiblingKeys(siblingKeysData);
 
     const validationResult = validateKeyName(keyName, project.projectId, parentId, siblingKeysData);
@@ -145,7 +160,7 @@ export default function CreateEntity({
       });
     });
 
-    await createProjectEntity({
+    const result = await createProjectEntity({
       projectId,
       parentId,
       id: newKeyId,
@@ -155,6 +170,16 @@ export default function CreateEntity({
       type: entityType,
       pathCache: entityPath,
     });
+
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Creating Entity'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
 
     setLoading(false);
 
@@ -339,7 +364,7 @@ export default function CreateEntity({
           type="button"
           className="button primary modal-button"
           onClick={handleCreateClick}
-          disabled={keyName.length < 1}
+          disabled={loading || keyName.trim().length < 1}
         >Create
         </button>
       </div>

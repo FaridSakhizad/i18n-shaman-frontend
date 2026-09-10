@@ -24,6 +24,8 @@ import {
   ILanguage,
   IProject,
 } from 'interfaces';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
+import { getApiErrorMessage } from 'api/errors';
 
 import ExportProject from 'components/ExportProject/ExportProject';
 import Modal from 'components/Modal';
@@ -40,6 +42,7 @@ export default function Projects() {
 
   const [projectToDeleteId, setProjectToDeleteId] = useState<string | null>(null);
   const [isDeleteConfirmationVisible, setIsDeleteConfirmationVisible] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
 
   const handleDeleteClick = (projectId: string) => {
     setProjectToDeleteId(projectId);
@@ -55,14 +58,33 @@ export default function Projects() {
       setIsDeleteConfirmationVisible(false);
     };
 
-    const handleDeleteConfirmationConfirmButtonClick = () => {
-      dispatch(deleteProject(projectToDeleteId as string));
+    const handleDeleteConfirmationConfirmButtonClick = async () => {
+      if (!projectToDeleteId || deleteLoading) {
+        return;
+      }
 
-      setIsDeleteConfirmationVisible(false);
+      setDeleteLoading(true);
+
+      try {
+        await dispatch(deleteProject(projectToDeleteId)).unwrap();
+        setProjectToDeleteId(null);
+        setIsDeleteConfirmationVisible(false);
+      } catch (error) {
+        dispatch(createSystemNotification({
+          content: getApiErrorMessage(error, 'Error Deleting Project'),
+          type: EMessageType.Error,
+        }));
+      }
+
+      setDeleteLoading(false);
     };
 
     return (
       <Modal customClassNames="dialogModal">
+        {deleteLoading && (
+          <div className="loading modal-loading" />
+        )}
+
         <div className="modal-header">
           <h4 className="modal-title">Delete Project?</h4>
 
@@ -95,6 +117,7 @@ export default function Projects() {
             type="button"
             className="button danger dialogModal-button"
             onClick={handleDeleteConfirmationConfirmButtonClick}
+            disabled={deleteLoading}
           >
             Delete
           </button>
@@ -124,10 +147,21 @@ export default function Projects() {
     setIsExportProjectModalVisible(true);
   };
 
-  const handleProjectSave = (data: IProject) => {
-    dispatch(updateProject(data));
+  const handleProjectSave = async (data: IProject): Promise<boolean> => {
+    try {
+      await dispatch(updateProject(data)).unwrap();
 
-    setProjectIdInEdit(null);
+      setProjectIdInEdit(null);
+
+      return true;
+    } catch (error) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(error, 'Error Updating Project'),
+        type: EMessageType.Error,
+      }));
+
+      return false;
+    }
   };
 
   useEffect(() => {
@@ -163,15 +197,15 @@ export default function Projects() {
     }
 
     const projectsMap: Map<string, IProject> = new Map<string, IProject>(projects.map((project) => [project.projectId, project]));
+    const orderedProjectIds = new Set(projectsOrder);
 
-    const result = [];
+    const orderedProjectsData = projectsOrder
+      .map((id) => projectsMap.get(id))
+      .filter((project): project is IProject => Boolean(project));
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const id of projectsOrder) {
-      result.push(projectsMap.get(id));
-    }
+    const unorderedProjects = projects.filter((project) => !orderedProjectIds.has(project.projectId));
 
-    return result;
+    return [...orderedProjectsData, ...unorderedProjects];
   };
 
   const orderedProjects: IProject[] = getOrderedProjects() as IProject[];

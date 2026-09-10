@@ -18,7 +18,6 @@ import './i18n';
 import Auth from './pages/Auth';
 import ResetPassword from './pages/ResetPassword';
 import VerifyEmail from './pages/VerifyEmail';
-import verifyEmailLoader from './pages/VerifyEmail/loader';
 
 import Projects from './pages/Projects';
 import Editor from './pages/Editor';
@@ -29,7 +28,6 @@ import MainLayout from './MainLayout';
 import PrivateRoute from './PrivateRoute';
 import GuestOnlyRoute from './GuestOnlyRoute';
 
-import reportWebVitals from './reportWebVitals';
 import resetPasswordLoader from './pages/ResetPassword/loader';
 
 const router = createBrowserRouter([
@@ -49,7 +47,6 @@ const router = createBrowserRouter([
   {
     path: '/verify-email/:verificationToken?',
     element: <GuestOnlyRoute redirectPath="/" component={<VerifyEmail />} />,
-    loader: verifyEmailLoader,
   },
   {
     path: '/projects',
@@ -84,8 +81,3 @@ root.render(
     </MainLayout>
   </Provider>,
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

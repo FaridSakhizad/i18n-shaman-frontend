@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import Modal from 'components/Modal';
 
 import { getUserProjectById } from 'api/projects';
 import { IProjectLanguage } from 'interfaces';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
+import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import './EditProjectLanguage.scss';
 import { updateLanguage, IUpdateLanguage } from '../../api/languages';
@@ -22,15 +25,27 @@ export default function EditProjectLanguage({
   onCancel,
   onSave,
 }: IProps) {
+  const dispatch = useDispatch();
+
   const [loading, setLoading] = useState(true);
   const [languageInEdit, setLanguageInEdit] = useState<IProjectLanguage | null>(null);
 
   const getProjectsLanguages = async () => {
     const result = await getUserProjectById({ projectId });
 
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Loading Project Language'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
+
     const language = result.languages.find(({ id }: IProjectLanguage) => id === languageId);
 
-    setLanguageInEdit(language);
+    setLanguageInEdit(language || null);
 
     setLoading(false);
   };
@@ -79,12 +94,26 @@ export default function EditProjectLanguage({
   };
 
   const handleSaveButtonClick = async () => {
+    if (!languageInEdit || loading) {
+      return;
+    }
+
     setLoading(true);
 
-    await updateLanguage({
+    const result = await updateLanguage({
       projectId,
       ...languageInEdit,
     } as IUpdateLanguage);
+
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Updating Project Language'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
 
     setLoading(false);
 
@@ -205,6 +234,7 @@ export default function EditProjectLanguage({
           type="button"
           className="button primary addProjectLang-addButton"
           onClick={handleSaveButtonClick}
+          disabled={loading}
         >
           Save
         </button>

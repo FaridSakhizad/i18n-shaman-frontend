@@ -134,7 +134,7 @@ export default function Editor() {
       [ESearchParams.skipComponents]: false,
     } as ISearchParams;
 
-    const data = urlSearchParams.get('search_params');
+    const data = urlSearchParams.get('searchParams') || urlSearchParams.get('search_params');
 
     if (!data) {
       return defaults;
@@ -174,7 +174,7 @@ export default function Editor() {
 
   const [isLanguagesModalVisible, setIsLanguagesModalVisible] = useState<boolean>(false);
 
-  const [, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [isAddLanguageModalVisible, setAddLanguageModalVisible] = useState<boolean>(false);
 
@@ -193,7 +193,12 @@ export default function Editor() {
       searchParams,
     });
 
-    if (!isApiError(result)) {
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Loading Project'),
+        type: EMessageType.Error,
+      }));
+    } else {
       setProject(result);
     }
 
@@ -241,12 +246,23 @@ export default function Editor() {
     setInEditProjectId(projectId);
   };
 
-  const handleProjectSave = async (data: IProject) => {
-    await dispatch(updateProject(data));
+  const handleProjectSave = async (data: IProject): Promise<boolean> => {
+    try {
+      await dispatch(updateProject(data)).unwrap();
+    } catch (error) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(error, 'Error Updating Project'),
+        type: EMessageType.Error,
+      }));
+
+      return false;
+    }
 
     await fetchProjectData();
 
     setInEditProjectId(null);
+
+    return true;
   };
 
   const handleProjectLanguagesButtonClick = () => {
@@ -290,7 +306,7 @@ export default function Editor() {
 
   const [idOfEntityToDelete, setIdOfEntityToDelete] = useState<string | null>(null);
 
-  const deleteEntity = async (id: string) => {
+  const deleteEntity = async (id: string): Promise<boolean> => {
     const result = await deleteProjectEntities({
       projectId: currentProjectId,
       entityIds: [id],
@@ -301,9 +317,13 @@ export default function Editor() {
         content: getApiErrorMessage(result, 'Error Deleting Entity'),
         type: EMessageType.Error,
       }));
-    } else {
-      fetchProjectData();
+
+      return false;
     }
+
+    await fetchProjectData();
+
+    return true;
   };
 
   const [isEntityDeleteConfirmVisible, setEntityDeleteConfirmVisible] = useState<boolean>(false);
@@ -318,15 +338,18 @@ export default function Editor() {
     };
 
     const handleDeleteConfirmationConfirmButtonClick = async () => {
-      if (!idOfEntityToDelete) {
+      if (!idOfEntityToDelete || loading) {
         return;
       }
 
       setLoading(true);
 
-      await deleteEntity(idOfEntityToDelete);
+      const deleted = await deleteEntity(idOfEntityToDelete);
 
-      setEntityDeleteConfirmVisible(false);
+      if (deleted) {
+        setEntityDeleteConfirmVisible(false);
+        setIdOfEntityToDelete(null);
+      }
 
       setLoading(false);
     };
@@ -365,6 +388,7 @@ export default function Editor() {
             type="button"
             className="button danger dialogModal-button"
             onClick={handleDeleteConfirmationConfirmButtonClick}
+            disabled={loading}
           >
             Delete
           </button>
@@ -487,12 +511,19 @@ export default function Editor() {
     if (elName === 'duplicateEntity') {
       setLoading(true);
 
-      await duplicateEntities({
+      const result = await duplicateEntities({
         projectId: currentProjectId,
         entityIds: [dataset.id as string],
       });
 
-      await fetchProjectData();
+      if (isApiError(result)) {
+        dispatch(createSystemNotification({
+          content: getApiErrorMessage(result, 'Error Duplicating Entity'),
+          type: EMessageType.Error,
+        }));
+      } else {
+        await fetchProjectData();
+      }
 
       setLoading(false);
     }
@@ -573,8 +604,10 @@ export default function Editor() {
         .join(',');
 
       if (searchParamsString.length > 0) {
-        url.searchParams.set('search_params', searchParamsString);
+        url.searchParams.set('searchParams', searchParamsString);
+        url.searchParams.delete('search_params');
       } else {
+        url.searchParams.delete('searchParams');
         url.searchParams.delete('search_params');
       }
 
@@ -700,13 +733,15 @@ export default function Editor() {
 
     const projectsMap: Map<string, IProject> = new Map<string, IProject>(projects.map((projectData) => [projectData.projectId, projectData]));
 
-    const result: (IProject | undefined)[] = [];
+    const orderedProjectIds = new Set(preferences.projectsOrder);
 
-    preferences.projectsOrder.forEach((id) => {
-      result.push(projectsMap.get(id));
-    });
+    const orderedProjectsData = preferences.projectsOrder
+      .map((id) => projectsMap.get(id))
+      .filter((projectData): projectData is IProject => Boolean(projectData));
 
-    return result;
+    const unorderedProjects = projects.filter((projectData) => !orderedProjectIds.has(projectData.projectId));
+
+    return [...orderedProjectsData, ...unorderedProjects];
   };
 
   const orderedProjects: IProject[] = getOrderedProjects() as IProject[];
@@ -750,6 +785,10 @@ export default function Editor() {
   };
 
   const onDeleteSelectedConfirm = async () => {
+    if (loading || selectedEntities.length < 1) {
+      return;
+    }
+
     setLoading(true);
 
     const result = await deleteProjectEntities({
@@ -762,28 +801,42 @@ export default function Editor() {
         content: getApiErrorMessage(result, 'Error Deleting Entity'),
         type: EMessageType.Error,
       }));
-    } else {
-      fetchProjectData();
+      setLoading(false);
+
+      return;
     }
 
+    await fetchProjectData();
     dispatch(setSelectedEntities([]));
-
     setIsDeleteSelectedConfirmVisible(false);
-
     setLoading(false);
   };
 
   const handleDuplicateSelectedClick = async () => {
+    if (loading || selectedEntities.length < 1) {
+      return;
+    }
+
     setLoading(true);
 
-    await duplicateEntities({
+    const result = await duplicateEntities({
       projectId: currentProjectId,
       entityIds: selectedEntities,
     });
 
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Duplicating Entities'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
+
     dispatch(setSelectedEntities([]));
 
-    fetchProjectData();
+    await fetchProjectData();
 
     setLoading(false);
   };
@@ -808,12 +861,9 @@ export default function Editor() {
 
   return (
     <>
-      {/*
-        <h1>{t('Welcome to React')}</h1>
-        <h1>{t('key1')}</h1>
-        <h1>{t('key2.key2_inner_key1')}</h1>
-        <h1>{t('key3.dotted.name')}</h1>
-      */}
+      {loading && (
+        <div className="loading" />
+      )}
 
       {projects && inEditProjectId && (
         <EditProject
@@ -1073,7 +1123,7 @@ export default function Editor() {
             <div className="dialogModal-content">
               <i className="dialogBadge question danger dialogModal-badge" />
               <div className="dialogModal-contentText">
-                <p className="dialogModal-contentPara">Are you sure you want move Selected Entities?</p>
+                <p className="dialogModal-contentPara">Are you sure you want to delete selected entities?</p>
               </div>
             </div>
           </div>
@@ -1089,6 +1139,7 @@ export default function Editor() {
               type="button"
               className="button danger dialogModal-button"
               onClick={onDeleteSelectedConfirm}
+              disabled={loading}
             >
               Yes, delete selected
             </button>

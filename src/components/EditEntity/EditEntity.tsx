@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import Modal from 'components/Modal';
 import {
@@ -12,6 +13,7 @@ import {
 import { validateKeyName } from 'utils/validators';
 import { getKeyData, updateKey } from 'api/projects';
 import { getApiErrorMessage, isApiError } from 'api/errors';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import './EditEntity.scss';
 
@@ -32,6 +34,8 @@ export default function EditEntity({
   onCancel,
   onSave,
 }: IProps) {
+  const dispatch = useDispatch();
+
   const [loading, setLoading] = useState<boolean>(true);
 
   const [key, setKey] = useState<IKey>();
@@ -41,7 +45,17 @@ export default function EditEntity({
   const fetchKeyData = async () => {
     const keyData = await getKeyData({ projectId: project.projectId, keyId });
 
-    const { key: keyInfo = {}, values = {} } = keyData;
+    if (isApiError(keyData)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(keyData, 'Error Loading Entity'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
+
+    const { key: keyInfo, values = {} } = keyData;
 
     setEntityLabel(keyInfo.label);
 
@@ -70,7 +84,7 @@ export default function EditEntity({
   const [keyNameError, setKeyNameError] = useState<string | null>('');
 
   const handleNameChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-    if (!key) {
+    if (!key || loading) {
       return;
     }
 
@@ -143,7 +157,13 @@ export default function EditEntity({
     });
 
     if (isApiError(result)) {
-      alert(getApiErrorMessage(result, 'Error While Saving Key'));
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error While Saving Key'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
     }
 
     setLoading(false);

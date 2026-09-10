@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import './ResetPassword.css';
 import { getPasswordResetSecurityToken, setNewPassword } from 'api/user';
@@ -9,12 +9,11 @@ import Modal from 'components/Modal';
 
 export default function ResetPassword() {
   const { resetToken } = useParams<{ resetToken: string }>();
-
-  if (!resetToken || resetToken.length < 1) {
-    window.location.href = '/';
-  }
+  const navigate = useNavigate();
+  const isResetTokenInvalid = !resetToken || resetToken.length < 1;
 
   const [submitAttemptMade, setSubmitAttemptMade] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [formGeneralError, setFormGeneralError] = useState<string | null>(null);
   const [showResetSuccess, setShowResetSuccess] = useState<boolean>(false);
@@ -25,10 +24,14 @@ export default function ResetPassword() {
   const handleSetNewPwdFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (loading) {
+      return;
+    }
+
     setSubmitAttemptMade(true);
     setFormGeneralError(null);
 
-    if (!resetToken || resetToken.length < 1) {
+    if (isResetTokenInvalid || !resetToken) {
       return;
     }
 
@@ -52,10 +55,13 @@ export default function ResetPassword() {
       return;
     }
 
+    setLoading(true);
+
     const getSecurityTokenResult = await getPasswordResetSecurityToken(resetToken);
 
     if (isApiError(getSecurityTokenResult) || !getSecurityTokenResult.success) {
       setFormGeneralError(getApiErrorMessage(getSecurityTokenResult, 'Unknown Error'));
+      setLoading(false);
 
       return;
     }
@@ -70,23 +76,27 @@ export default function ResetPassword() {
 
     if (!isApiError(result) && result.success) {
       setShowResetSuccess(true);
+      setLoading(false);
 
       return;
     }
 
     if (getApiErrorStatus(result) === 403) {
-      window.location.href = '/';
+      setLoading(false);
+      navigate('/');
 
       return;
     }
 
-    if (getApiErrorStatus(result) === 406) {
+    if (getApiErrorStatus(result) === 400) {
       setFormGeneralError(EPasswordValidationErrors.INVALID);
+      setLoading(false);
 
       return;
     }
 
-    window.location.href = '/';
+    setLoading(false);
+    navigate('/');
   };
 
   const handlePasswordFieldChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +153,10 @@ export default function ResetPassword() {
     }
   };
 
+  if (isResetTokenInvalid) {
+    return <Navigate to="/" replace />;
+  }
+
   if (showResetSuccess) {
     return (
       <Modal customClassNames="modal_withBottomButtons modal_signupSuccess">
@@ -150,6 +164,7 @@ export default function ResetPassword() {
           <h2 className="h2 modal-title success">Password Reset Successful</h2>
         </div>
         <div className="modal-content">
+          <p>If your email is not verified yet, please check your inbox and confirm it before logging in.</p>
           <a
             href="/auth"
             type="button"
@@ -164,6 +179,10 @@ export default function ResetPassword() {
 
   return (
     <div className="setNewPwdPage">
+      {loading && (
+        <div className="loading" />
+      )}
+
       <div className="modal-window modal-window_resetPwd">
         <div className="modal-header">
           <h2 className="h2">Set new password</h2>
@@ -226,7 +245,13 @@ export default function ResetPassword() {
           </div>
 
           <div className="formMk1-row setNewPwdForm-row_controls">
-            <button type="submit" className="button primary setNewPwdForm-submitButton">Set New Password</button>
+            <button
+              type="submit"
+              className="button primary setNewPwdForm-submitButton"
+              disabled={loading}
+            >
+              Set New Password
+            </button>
           </div>
         </form>
       </div>

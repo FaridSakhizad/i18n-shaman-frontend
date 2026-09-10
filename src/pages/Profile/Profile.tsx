@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
-import { IRootState } from 'store';
-import { useSelector } from 'react-redux';
+import { AppDispatch, IRootState } from 'store';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Header from 'components/Header';
 import Footer from 'components/Footer';
+import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 
 import { validatePassword, EPasswordValidationErrors, EValidationErrors } from 'utils/validators';
 
@@ -21,6 +22,7 @@ interface IPasswordUpdateErrors {
 }
 
 export default function Profile() {
+  const dispatch = useDispatch<AppDispatch>();
   const { email: userEmail } = useSelector((state: IRootState) => state.user);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -95,6 +97,10 @@ export default function Profile() {
   const handleNewPasswordFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (loading) {
+      return;
+    }
 
     setUpdatePasswordAttemptMade(true);
 
@@ -181,6 +187,12 @@ export default function Profile() {
     setPassword('');
     setNewPassword('');
     setConfirmPassword('');
+    setUpdatePasswordAttemptMade(false);
+
+    dispatch(createSystemNotification({
+      content: 'Password Updated',
+      type: EMessageType.Success,
+    }));
 
     setLoading(false);
   };
@@ -289,7 +301,12 @@ export default function Profile() {
               </div>
               <div className="formMk2-row">
                 <div className="formMk2-rowContent">
-                  <button type="submit" className="button primary updatePasswordForm-submitButton">Set New Password
+                  <button
+                    type="submit"
+                    className="button primary updatePasswordForm-submitButton"
+                    disabled={loading}
+                  >
+                    Set New Password
                   </button>
                 </div>
               </div>

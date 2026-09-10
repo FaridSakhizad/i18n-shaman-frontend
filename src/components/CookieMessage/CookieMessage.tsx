@@ -6,13 +6,17 @@ import { removeGlobalMessage } from 'store/globalMessages';
 
 import './CookieMessage.css';
 
-export default function CookieMessage() {
+interface IProps {
+  messageId: string;
+}
+
+export default function CookieMessage({ messageId }: IProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleAgreeButtonClick = () => {
     document.cookie = 'userAgreedToCookie=true';
 
-    dispatch(removeGlobalMessage('CookieMessage'));
+    dispatch(removeGlobalMessage(messageId));
   };
 
   return (

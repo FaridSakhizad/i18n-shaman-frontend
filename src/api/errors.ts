@@ -4,10 +4,10 @@ export interface IApiResponse<T> {
   success: true;
   data: T;
   meta?: Record<string, unknown>;
-  requestId?: string;
+  requestId: string;
   correlationId?: string;
-  path?: string;
-  timestamp?: string;
+  path: string;
+  timestamp: string;
   version?: string;
 }
 
@@ -29,10 +29,6 @@ export function isApiResponse<T = unknown>(value: unknown): value is IApiRespons
     && 'data' in value
     && (value as { success?: unknown }).success === true,
   );
-}
-
-export function unwrapApiResponse<T>(value: T | IApiResponse<T>): T {
-  return isApiResponse<T>(value) ? value.data : value;
 }
 
 export function getApiErrorMessage(value: unknown, fallback: string): string {

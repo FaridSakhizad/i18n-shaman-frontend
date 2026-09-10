@@ -72,6 +72,16 @@ export default function ProjectLanguages({
 
     const result = await getAppLanguagesData();
 
+    if (isApiError(result)) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(result, 'Error Loading Languages'),
+        type: EMessageType.Error,
+      }));
+      setLoading(false);
+
+      return;
+    }
+
     const availableLanguages = getAvailableLanguages(project.languages, result);
 
     setLanguageData(result);
@@ -101,11 +111,10 @@ export default function ProjectLanguages({
       }));
     } else {
       setProjectLanguages(result.languages);
+      onHideAll();
     }
 
     setLoading(false);
-
-    onHideAll();
   };
 
   const handleHideLangClick = async (e: React.MouseEvent<HTMLButtonElement>, langId: string) => {
@@ -120,11 +129,10 @@ export default function ProjectLanguages({
       }));
     } else {
       setProjectLanguages(result.languages);
+      onHide(langId);
     }
 
     setLoading(false);
-
-    onHide(langId);
   };
 
   const handleShowLangClick = async (e: React.MouseEvent<HTMLButtonElement>, langId: string) => {
@@ -139,11 +147,10 @@ export default function ProjectLanguages({
       }));
     } else {
       setProjectLanguages(result.languages);
+      onHide(langId);
     }
 
     setLoading(false);
-
-    onHide(langId);
   };
 
   const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>, langId: string) => {
@@ -172,13 +179,12 @@ export default function ProjectLanguages({
       const availableLanguages = getAvailableLanguages(result.languages, languageData);
 
       setAvailableLanguagesList(availableLanguages);
+      onDelete(langId);
     }
 
     setLangToBeDeletedId('');
 
     setLoading(false);
-
-    onDelete(langId);
   };
 
   const handleDeleteClick = async (e: React.MouseEvent<HTMLButtonElement>, langId: string) => {
@@ -231,11 +237,10 @@ export default function ProjectLanguages({
       setIsQuickAddVisible(false);
       setAvailableLanguagesList(getAvailableLanguages(resultProject.languages, languageData));
       setProjectLanguages(resultProject.languages);
+      onAddLanguage();
     }
 
     setLoading(false);
-
-    onAddLanguage();
   };
 
   const handleSelectedLanguagesChange = (data: ILanguage[]) => {

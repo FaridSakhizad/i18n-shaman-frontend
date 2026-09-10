@@ -55,6 +55,10 @@ const systemNotificationsSlice = createAppSlice({
     removeSystemNotification: (state, { payload }) => {
       const index = state.notifications.findIndex(({ id }) => id === payload);
 
+      if (index === -1) {
+        return;
+      }
+
       state.notifications.splice(index, 1);
     },
   },

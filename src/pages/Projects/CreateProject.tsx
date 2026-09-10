@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import Modal from 'components/Modal';
 import { createProject } from '../../store/projects';
 import { AppDispatch } from '../../store';
+import { createSystemNotification, EMessageType } from '../../store/systemNotifications';
+import { getApiErrorMessage } from '../../api/errors';
 
 interface IProps {
   onClose: () => void;
@@ -32,15 +34,28 @@ export default function CreateProject({
   };
 
   const handleSaveClick = async () => {
+    const projectName = newProjectName.trim();
+
+    if (!projectName || loading) {
+      return;
+    }
+
     setLoading(true);
 
-    dispatch(createProject({
-      newProjectName,
-    }));
+    try {
+      await dispatch(createProject({
+        newProjectName: projectName,
+      })).unwrap();
+
+      onClose();
+    } catch (error) {
+      dispatch(createSystemNotification({
+        content: getApiErrorMessage(error, 'Error Creating Project'),
+        type: EMessageType.Error,
+      }));
+    }
 
     setLoading(false);
-
-    onClose();
   };
 
   return (
@@ -96,6 +111,7 @@ export default function CreateProject({
           type="button"
           className="button success modal-button"
           onClick={handleSaveClick}
+          disabled={loading || newProjectName.trim().length < 1}
         >
           Save
         </button>

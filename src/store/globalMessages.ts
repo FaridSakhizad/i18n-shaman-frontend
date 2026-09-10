@@ -36,12 +36,18 @@ const getInitialState = (): IMessage[] => {
   const cookieMap = parseCookie(window.document.cookie);
 
   if (!cookieMap.get('userAgreedToCookie')) {
+    const cookieMessageId = Math.random().toString(16).substring(2);
+
     registerSystemMessageComponent('CookieMessage', CookieMessage);
 
     return [{
-      id: Math.random().toString(16).substring(2),
+      id: cookieMessageId,
+      type: EMessageType.Default,
       contentType: EContentType.Component,
       component: 'CookieMessage',
+      componentProps: {
+        messageId: cookieMessageId,
+      },
     } as IMessage];
   }
 
@@ -53,7 +59,7 @@ const initialState: IInitialState = {
 };
 
 const globalMessagesSlice = createAppSlice({
-  name: 'systemNotifications',
+  name: 'globalMessages',
   initialState,
   reducers: {
     createGlobalMessage: (state, action: { payload: any, type: string }) => {
@@ -70,6 +76,10 @@ const globalMessagesSlice = createAppSlice({
     },
     removeGlobalMessage: (state, { payload }) => {
       const index = state.messages.findIndex(({ id }) => id === payload);
+
+      if (index === -1) {
+        return;
+      }
 
       state.messages.splice(index, 1);
     },
