@@ -89,4 +89,10 @@ export default defineConfig([
       '@typescript-eslint/no-wrapper-object-types': 'warn',
     },
   },
+  {
+    files: ['src/router.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])
