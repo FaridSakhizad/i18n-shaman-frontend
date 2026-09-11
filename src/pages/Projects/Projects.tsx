@@ -166,7 +166,7 @@ export default function Projects() {
 
   useEffect(() => {
     dispatch(getProjects());
-  }, []);
+  }, [dispatch]);
 
   const [projectsOrder, setProjectsOrder] = useState<string[]>(preferences.projectsOrder);
 

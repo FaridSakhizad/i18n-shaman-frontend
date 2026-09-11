@@ -30,7 +30,7 @@ interface IValidationResponseError {
 }
 
 interface IValidationResponse {
-  success: Boolean,
+  success: boolean,
   errors: IValidationResponseError[],
   warnings?: any[],
 }

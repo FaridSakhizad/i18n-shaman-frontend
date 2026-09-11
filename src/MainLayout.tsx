@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import store, { IRootState } from 'store';
 import { restoreSession } from 'store/user';
-import { changeLanguage } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { getAppLanguages } from './store/app';
 import SystemNotifications from './components/SystemNotifications';
@@ -19,27 +18,18 @@ export default function MainLayout({ children }: IProps) {
 
   const dispatch = useDispatch<typeof store.dispatch>();
 
-  const getAppData = () => {
+  useEffect(() => {
     dispatch(getAppLanguages());
-  };
-
-  const getUserInformation = () => {
     dispatch(restoreSession());
-  };
+  }, [dispatch]);
 
-  const setUserLanguage = () => {
+  useEffect(() => {
     const { language } = settings;
 
     if (language && language !== i18n.language) {
-      changeLanguage(language);
+      i18n.changeLanguage(language);
     }
-  };
-
-  useEffect(() => {
-    getAppData();
-    getUserInformation();
-    setUserLanguage();
-  }, []);
+  }, [i18n, settings]);
 
   return (
     <>

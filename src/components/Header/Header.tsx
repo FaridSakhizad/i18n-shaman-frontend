@@ -13,13 +13,9 @@ import Dropdown from '../Dropdown';
 import ImportLocales from '../ImportLocales';
 import ImportComponents from '../ImportComponents';
 import ExportProject from '../ExportProject/ExportProject';
+import { EHeaderModes } from './constants';
 
 import './Header.css';
-
-export enum EHeaderModes {
-  DEFAULT = 'Default',
-  EDITOR = 'Editor',
-}
 
 interface IProps {
   mode?: EHeaderModes,

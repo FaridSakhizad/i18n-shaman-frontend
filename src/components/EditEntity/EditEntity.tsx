@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import Modal from 'components/Modal';
@@ -42,7 +42,7 @@ export default function EditEntity({
   const [entityLabel, setEntityLabel] = useState<string>();
   const [keyValues, setValues] = useState<{ [key: string]: IKeyValue }>({});
 
-  const fetchKeyData = async () => {
+  const fetchKeyData = useCallback(async () => {
     const keyData = await getKeyData({ projectId: project.projectId, keyId });
 
     if (isApiError(keyData)) {
@@ -63,11 +63,11 @@ export default function EditEntity({
     setValues(values[keyId]);
 
     setLoading(false);
-  };
+  }, [dispatch, keyId, project.projectId]);
 
   useEffect(() => {
     fetchKeyData();
-  }, []);
+  }, [fetchKeyData]);
 
   const getInitialSelectedLanguageId = () => {
     if (!project) {
@@ -111,19 +111,21 @@ export default function EditEntity({
       return;
     }
 
-    if (keyValues[selectedLanguageId]) {
-      keyValues[selectedLanguageId].value = value;
-    } else {
-      keyValues[selectedLanguageId] = {
+    setValues({
+      ...keyValues,
+      [selectedLanguageId]: keyValues[selectedLanguageId]
+        ? {
+          ...keyValues[selectedLanguageId],
+          value,
+        }
+        : {
         languageId: selectedLanguageId,
         keyId: key.id,
         projectId: project.projectId,
         parentId: project.projectId,
         value,
-      };
-    }
-
-    setValues(structuredClone(keyValues));
+      },
+    });
   };
 
   const handleDescriptionChange = ({ target: { value } }: React.ChangeEvent<HTMLTextAreaElement>) => {

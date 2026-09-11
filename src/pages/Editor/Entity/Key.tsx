@@ -83,20 +83,22 @@ export default function Key(props: IProps) {
   const keyEditValueFieldRef = useRef<HTMLTextAreaElement>(null);
 
   const handleValueChange = ({ target: { value } }: React.ChangeEvent<HTMLTextAreaElement>, valueLanguageId: string) => {
-    if (values && values[valueLanguageId] && values[valueLanguageId].value) {
-      values[valueLanguageId].value = value;
-    } else {
-      values[valueLanguageId] = {
+    setValues({
+      ...values,
+      [valueLanguageId]: values?.[valueLanguageId]?.value
+        ? {
+          ...values[valueLanguageId],
+          value,
+        }
+        : {
         languageId: valueLanguageId,
         value,
         keyId: id,
         projectId,
         parentId,
         pathCache: `${pathCache}/${id}`,
-      };
-    }
-
-    setValues(structuredClone(values));
+      },
+    });
   };
 
   const handleValueSave = async () => {

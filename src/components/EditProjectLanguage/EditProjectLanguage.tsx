@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import Modal from 'components/Modal';
 
@@ -30,7 +30,7 @@ export default function EditProjectLanguage({
   const [loading, setLoading] = useState(true);
   const [languageInEdit, setLanguageInEdit] = useState<IProjectLanguage | null>(null);
 
-  const getProjectsLanguages = async () => {
+  const getProjectsLanguages = useCallback(async () => {
     const result = await getUserProjectById({ projectId });
 
     if (isApiError(result)) {
@@ -48,7 +48,7 @@ export default function EditProjectLanguage({
     setLanguageInEdit(language || null);
 
     setLoading(false);
-  };
+  }, [dispatch, languageId, projectId]);
 
   const handleCustomCodeSwitcherChange = ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
     setLanguageInEdit({
@@ -122,7 +122,7 @@ export default function EditProjectLanguage({
 
   useEffect(() => {
     getProjectsLanguages();
-  }, []);
+  }, [getProjectsLanguages]);
 
   if (!languageInEdit) {
     return null;

@@ -87,11 +87,9 @@ export default function TagsEditor(props: IProps) {
       ...tagInEdit as ITag,
     });
 
-    const tagIdx = tagsList.findIndex((tag) => tag.id === tagInEdit.id);
-
-    tagsList[tagIdx] = tagInEdit;
-
-    setTagsList([...tagsList]);
+    setTagsList(tagsList.map((tag) => (
+      tag.id === tagInEdit.id ? tagInEdit : tag
+    )));
 
     setTagInEdit(null);
   };
@@ -267,9 +265,6 @@ export default function TagsEditor(props: IProps) {
                         </div>
                       </div>
                       <div className="formControl-footer">
-                        {false && (
-                          <div className="formControl-error">Please Enter Your Name</div>
-                        )}
                       </div>
                     </div>
 

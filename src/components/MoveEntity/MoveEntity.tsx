@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -52,7 +52,7 @@ export default function MoveEntity(props: IProps) {
   const [destinationFolderId, setDestinationFolderId] = useState<string>();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
 
-  const getChildrenByParentIds = (children: IKey[]): IChildrenStatistics => {
+  const getChildrenByParentIds = useCallback((children: IKey[]): IChildrenStatistics => {
     const result: IChildrenStatistics = {};
 
     children.forEach((entity: IKey) => {
@@ -81,9 +81,9 @@ export default function MoveEntity(props: IProps) {
     });
 
     return result;
-  };
+  }, []);
 
-  const fetchProjectData = async (theProjectId: string, subFolderId?: string) => {
+  const fetchProjectData = useCallback(async (theProjectId: string, subFolderId?: string) => {
     setLoading(true);
 
     const result = await getUserProjectById({
@@ -120,11 +120,11 @@ export default function MoveEntity(props: IProps) {
     setProject(result);
 
     setLoading(false);
-  };
+  }, [dispatch, getChildrenByParentIds, projectId]);
 
   useEffect(() => {
     fetchProjectData(projectId);
-  }, []);
+  }, [fetchProjectData, projectId]);
 
   const handleOpenEntityClick = async (id: string) => {
     setLoading(true);

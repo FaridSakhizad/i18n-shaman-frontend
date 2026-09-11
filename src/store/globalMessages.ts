@@ -25,7 +25,7 @@ export interface IMessage {
   content?: string;
   component?: string;
   componentProps?: Record<string, any>;
-  closeButton?: Boolean;
+  closeButton?: boolean;
 }
 
 interface IInitialState {

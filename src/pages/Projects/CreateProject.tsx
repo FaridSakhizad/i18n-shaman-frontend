@@ -91,9 +91,6 @@ export default function CreateProject({
               />
             </div>
             <div className="formControl-footer">
-              {false && (
-                <div className="formControl-error">EDIT PROJECT ERROR</div>
-              )}
             </div>
           </div>
         </div>

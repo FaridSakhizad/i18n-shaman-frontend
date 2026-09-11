@@ -50,7 +50,7 @@ export interface IKey {
   tags: IKeyTag[]
 }
 
-export interface IKeyUpdateError extends IError {}
+export type IKeyUpdateError = IError;
 
 export interface ILanguage {
   id: string;
@@ -87,7 +87,7 @@ export interface IProject {
   tags: ITag[];
 }
 
-export interface IProjectUpdateError extends IError {}
+export type IProjectUpdateError = IError;
 
 export interface IUserLanguagesMapItem {
   [key: string]: ILanguage | IProjectLanguage;

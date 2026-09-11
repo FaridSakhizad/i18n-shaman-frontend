@@ -9,7 +9,7 @@ import { createSystemNotification, EMessageType } from 'store/systemNotification
 
 import { validatePassword, EPasswordValidationErrors, EValidationErrors } from 'utils/validators';
 
-import { ELoginErrorMessageTexts } from 'pages/Auth/Auth';
+import { ELoginErrorMessageTexts } from 'pages/Auth/constants';
 
 import './Profile.css';
 import { getUpdatePasswordSecurityToken, updatePassword } from 'api/user';
@@ -223,7 +223,7 @@ export default function Profile() {
 
               <div className="formMk2-row">
                 <div className="formMk2-rowTitle">
-                  <label className="formMk2-rowLabel">Password</label>
+                  <label className="formMk2-rowLabel" htmlFor="profile-current-password">Password</label>
                 </div>
                 <div className="formMk2-rowContent">
                   <div className="formControl autoError">
@@ -231,6 +231,7 @@ export default function Profile() {
                       <div className="formControl-wrapper">
                         <input
                           type="password"
+                          id="profile-current-password"
                           placeholder="Current password"
                           name="password"
                           className="input formControl-input"
@@ -249,7 +250,7 @@ export default function Profile() {
               </div>
               <div className="formMk2-row">
                 <div className="formMk2-rowTitle">
-                  <label className="formMk2-rowLabel">New Password</label>
+                  <label className="formMk2-rowLabel" htmlFor="profile-new-password">New Password</label>
                 </div>
                 <div className="formMk2-rowContent">
                   <div className="formControl autoError">
@@ -257,6 +258,7 @@ export default function Profile() {
                       <div className="formControl-wrapper">
                         <input
                           type="password"
+                          id="profile-new-password"
                           placeholder="New password"
                           name="password"
                           className="input formControl-input"
@@ -275,7 +277,7 @@ export default function Profile() {
               </div>
               <div className="formMk2-row">
                 <div className="formMk2-rowTitle">
-                  <label className="formMk2-rowLabel">Confirm New Password</label>
+                  <label className="formMk2-rowLabel" htmlFor="profile-confirm-password">Confirm New Password</label>
                 </div>
                 <div className="formMk2-rowContent">
                   <div className="formControl autoError">
@@ -283,6 +285,7 @@ export default function Profile() {
                       <div className="formControl-wrapper">
                         <input
                           type="password"
+                          id="profile-confirm-password"
                           placeholder="Confirm New Password"
                           name="confirmPassword"
                           className="input formControl-input"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getEmailVerificationSecurityToken, verifyEmail } from 'api/user';
 import { isApiError } from 'api/errors';
@@ -11,7 +11,7 @@ export default function VerifyEmail() {
   const [loading, setLoading] = useState(true);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
 
-  const performVerification = async () => {
+  const performVerification = useCallback(async () => {
     const getSecurityTokenResult = await getEmailVerificationSecurityToken(verificationToken);
 
     if (isApiError(getSecurityTokenResult) || !getSecurityTokenResult.success) {
@@ -30,7 +30,7 @@ export default function VerifyEmail() {
 
     setVerificationSuccess(true);
     setLoading(false);
-  };
+  }, [verificationToken]);
 
   useEffect(() => {
     if (!verificationToken || verificationToken.length < 1) {
@@ -40,7 +40,7 @@ export default function VerifyEmail() {
     }
 
     performVerification();
-  }, [verificationToken]);
+  }, [performVerification, verificationToken]);
 
   if (loading) {
     return (

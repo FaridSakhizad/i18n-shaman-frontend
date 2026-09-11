@@ -19,17 +19,11 @@ import {
   CombinedValidationMessage,
   validateEmail, validatePassword,
 } from 'utils/validators';
+import { ELoginErrorMessageTexts } from './constants';
 
 enum ETabs {
   Login = 'login',
   Register = 'register',
-}
-
-export enum ELoginErrorMessageTexts {
-  PLEASE_ENTER_EMAIL = 'Please enter your Email',
-  PLEASE_ENTER_VALID_EMAIL = 'Please enter valid Email',
-  PLEASE_ENTER_PASSWORD = 'Please enter your Password',
-  PLEASE_ENTER_VALID_PASSWORD = 'Please enter valid Password',
 }
 
 type ILoginErrors = {
@@ -444,11 +438,12 @@ export default function Auth() {
                     <div className="formMk1-row">
                       <div className="formControl">
                         <div className="formControl-header">
-                          <label className="formControl-label">Please enter Your Email</label>
+                          <label className="formControl-label" htmlFor="reset-password-email">Please enter Your Email</label>
                         </div>
                         <div className="formControl-wrapper">
                           <input
                             type="email"
+                            id="reset-password-email"
                             placeholder="Email"
                             name="email"
                             className="input formControl-input"
@@ -496,13 +491,14 @@ export default function Auth() {
                   <div className="formMk1-row">
                     <div className="formControl">
                       <div className="formControl-header">
-                        <label className="formControl-label">Email</label>
+                        <label className="formControl-label" htmlFor="login-email">Email</label>
                       </div>
                       <div className="formControl-body">
                         <div className="formControl-wrapper">
                           <i className="formControl-iconStart formControl-iconEmail" />
                           <input
                             type="text"
+                            id="login-email"
                             placeholder="Email"
                             name="email"
                             className="input formControl-input"
@@ -520,7 +516,7 @@ export default function Auth() {
                   <div className="formMk1-row">
                     <div className="formControl">
                       <div className="formControl-header">
-                        <label className="formControl-label">Password</label>
+                        <label className="formControl-label" htmlFor="login-password">Password</label>
                       </div>
                       <div className="formControl-body">
                         <div className="formControl-wrapper">
@@ -532,6 +528,7 @@ export default function Auth() {
                           />
                           <input
                             type={isPasswordVisible ? 'text' : 'password'}
+                            id="login-password"
                             placeholder="Password"
                             name="password"
                             className="input formControl-input"
@@ -590,13 +587,14 @@ export default function Auth() {
                 <div className="formMk1-row">
                   <div className="formControl">
                     <div className="formControl-header">
-                      <label className="formControl-label">Email</label>
+                      <label className="formControl-label" htmlFor="signup-email">Email</label>
                     </div>
                     <div className="formControl-body">
                       <div className="formControl-wrapper">
                         <i className="formControl-iconStart formControl-iconEmail" />
                         <input
                           type="text"
+                          id="signup-email"
                           placeholder="Email"
                           name="email"
                           className="input formControl-input"
@@ -614,7 +612,7 @@ export default function Auth() {
                 <div className="formMk1-row">
                   <div className="formControl">
                     <div className="formControl-header">
-                      <label className="formControl-label">Password</label>
+                      <label className="formControl-label" htmlFor="signup-password">Password</label>
                     </div>
                     <div className="formControl-body">
                       <div className="formControl-wrapper">
@@ -626,6 +624,7 @@ export default function Auth() {
                         />
                         <input
                           type={isPasswordVisible ? 'text' : 'password'}
+                          id="signup-password"
                           placeholder="Password"
                           name="password"
                           className="input formControl-input"

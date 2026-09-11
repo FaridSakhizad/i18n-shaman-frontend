@@ -1,4 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import './Dropdown.scss';
 
@@ -32,7 +37,7 @@ export default function Dropdown(props: IProps) {
 
   const [position, setPosition] = useState<IPosition>({});
 
-  const calculatePosition = () => {
+  const calculatePosition = useCallback(() => {
     const $target = document.querySelector(anchor);
 
     if (!$target) {
@@ -104,7 +109,7 @@ export default function Dropdown(props: IProps) {
         left: anchorLeft - dropDownWidth + anchorWidth,
       });
     }
-  };
+  }, [anchor, orientation]);
 
   const getPositionStyleObject = () => {
     const result: {
@@ -138,7 +143,7 @@ export default function Dropdown(props: IProps) {
 
   const positionStyle = getPositionStyleObject();
 
-  const handleOutsideClick = (e: MouseEvent) => {
+  const handleOutsideClick = useCallback((e: MouseEvent) => {
     if (!dropdownRef.current) {
       return;
     }
@@ -154,15 +159,15 @@ export default function Dropdown(props: IProps) {
     if (!$dropdown.contains(e.target as Node)) {
       onOutsideClick(e);
     }
-  };
+  }, [anchor, onOutsideClick]);
 
-  const attachOutsideClickListeners = () => {
+  const attachOutsideClickListeners = useCallback(() => {
     document.addEventListener('mousedown', handleOutsideClick);
-  };
+  }, [handleOutsideClick]);
 
-  const detachOutsideClickListeners = () => {
+  const detachOutsideClickListeners = useCallback(() => {
     document.removeEventListener('mousedown', handleOutsideClick);
-  };
+  }, [handleOutsideClick]);
 
   useEffect(() => {
     calculatePosition();
@@ -171,15 +176,15 @@ export default function Dropdown(props: IProps) {
     return () => {
       detachOutsideClickListeners();
     };
-  }, []);
+  }, [attachOutsideClickListeners, calculatePosition, detachOutsideClickListeners]);
 
-  const attachWindowMutateListeners = () => {
+  const attachWindowMutateListeners = useCallback(() => {
     window.addEventListener('resize', calculatePosition);
-  };
+  }, [calculatePosition]);
 
-  const detachWindowMutateListeners = () => {
+  const detachWindowMutateListeners = useCallback(() => {
     window.removeEventListener('resize', calculatePosition);
-  };
+  }, [calculatePosition]);
 
   useEffect(() => {
     attachWindowMutateListeners();
@@ -187,7 +192,7 @@ export default function Dropdown(props: IProps) {
     return () => {
       detachWindowMutateListeners();
     };
-  }, []);
+  }, [attachWindowMutateListeners, detachWindowMutateListeners]);
 
   if (!open) {
     return null;

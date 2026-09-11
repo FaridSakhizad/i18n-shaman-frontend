@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import AddLanguageControl from 'components/AddProjectLanguage/AddLanguageControl';
 import { addMultipleLanguages, getAppLanguagesData } from 'api/languages';
@@ -34,7 +34,7 @@ export default function QuickLanguageAdd(props: IProps) {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const getAvailableLanguages = (languages: IProjectLanguage[], allLanguages: ILanguage[] | undefined) => {
+  const getAvailableLanguages = useCallback((languages: IProjectLanguage[], allLanguages: ILanguage[] | undefined) => {
     const languagesMap:IUserLanguagesMapItem = {};
 
     languages.forEach((language: IProjectLanguage) => {
@@ -46,9 +46,9 @@ export default function QuickLanguageAdd(props: IProps) {
     }
 
     return allLanguages.filter(({ code }: ILanguage) => languagesMap[code] === undefined);
-  };
+  }, []);
 
-  const fetchLanguagesData = async () => {
+  const fetchLanguagesData = useCallback(async () => {
     setLoading(true);
 
     const result = await getAppLanguagesData();
@@ -59,11 +59,11 @@ export default function QuickLanguageAdd(props: IProps) {
     setAvailableLanguagesList(availableLanguages);
 
     setLoading(false);
-  };
+  }, [existingLanguages, getAvailableLanguages]);
 
   useEffect(() => {
     fetchLanguagesData();
-  }, []);
+  }, [fetchLanguagesData]);
 
   const handleAddSelectedClick = async () => {
     if (loading) {

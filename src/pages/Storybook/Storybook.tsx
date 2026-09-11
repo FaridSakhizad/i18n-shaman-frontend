@@ -12,50 +12,42 @@ export default function Storybook() {
         <div className="formMk1-row">
           <div className="formControl">
             <div className="formControl-header">
-              <label className="formControl-label">Email</label>
+              <label className="formControl-label" htmlFor="storybook-email">Email</label>
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <input className="input formControl-input" />
+                <input id="storybook-email" className="input formControl-input" />
               </div>
             </div>
-            <div className="formControl-footer">
-              {false && (
-                <div className="formControl-error">Please Enter Your Name</div>
-              )}
-            </div>
+            <div className="formControl-footer" />
           </div>
         </div>
 
         <div className="formMk1-row">
           <div className="formControl">
             <div className="formControl-header">
-              <label className="formControl-label">Password</label>
+              <label className="formControl-label" htmlFor="storybook-password">Password</label>
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
                 <i className="formControl-iconStart formControl-iconKey" />
                 <i className="formControl-iconEnd formControl-iconEye" />
-                <input className="input formControl-input" />
+                <input id="storybook-password" className="input formControl-input" />
               </div>
             </div>
-            <div className="formControl-footer">
-              {false && (
-                <div className="formControl-error">Please Enter Your Name</div>
-              )}
-            </div>
+            <div className="formControl-footer" />
           </div>
         </div>
 
         <div className="formMk1-row">
           <div className="formControl hasError">
             <div className="formControl-header">
-              <label className="formControl-label">First Name*</label>
+              <label className="formControl-label" htmlFor="storybook-first-name">First Name*</label>
               <i className="formControl-infoIcon" />
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <input type="text" className="input formControl-input" />
+                <input id="storybook-first-name" type="text" className="input formControl-input" />
               </div>
             </div>
             <div className="formControl-footer">
@@ -71,11 +63,11 @@ export default function Storybook() {
         <div className="formMk1-row">
           <div className="formControl">
             <div className="formControl-header">
-              <label className="formControl-label">Second Name* <i className="formControl-infoIcon" /></label>
+              <label className="formControl-label" htmlFor="storybook-second-name">Second Name* <i className="formControl-infoIcon" /></label>
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <input type="text" className="input formControl-input" />
+                <input id="storybook-second-name" type="text" className="input formControl-input" />
               </div>
             </div>
           </div>
@@ -84,11 +76,11 @@ export default function Storybook() {
         <div className="formMk1-row">
           <div className="formControl">
             <div className="formControl-header">
-              <label className="formControl-label">About yourself</label>
+              <label className="formControl-label" htmlFor="storybook-about">About yourself</label>
             </div>
             <div className="formControl-body">
               <div className="formControl-wrapper">
-                <textarea className="textarea formControl-textarea" />
+                <textarea id="storybook-about" className="textarea formControl-textarea" />
               </div>
             </div>
             <div className="formControl-footer">

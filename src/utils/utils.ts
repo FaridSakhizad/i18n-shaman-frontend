@@ -1,4 +1,4 @@
-export const debounce = (callback: Function, wait: number) => {
+export const debounce = (callback: (...args: any[]) => void, wait: number) => {
   let timeoutId: number | null = null;
 
   return (...args: any[]) => {

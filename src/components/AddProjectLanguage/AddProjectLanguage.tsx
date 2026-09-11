@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import Modal from 'components/Modal';
@@ -34,7 +34,7 @@ export default function AddProjectLanguage({
 
   const [selectedLanguages, setSelectedLanguages] = useState<IProjectLanguage[]>([]);
 
-  const getProjectLanguages = async () => {
+  const getProjectLanguages = useCallback(async () => {
     const result = await getUserProjectById({ projectId });
 
     const languages = await getAppLanguagesData();
@@ -62,11 +62,11 @@ export default function AddProjectLanguage({
     }
 
     setLoading(false);
-  };
+  }, [dispatch, projectId]);
 
   useEffect(() => {
     getProjectLanguages();
-  }, [projectId]);
+  }, [getProjectLanguages]);
 
   const [currentLanguageIdx, setCurrentLanguageIdx] = useState<number>(-1);
 
@@ -75,15 +75,19 @@ export default function AddProjectLanguage({
       return;
     }
 
-    selectedLanguages[currentLanguageIdx].customCodeEnabled = e.currentTarget.checked;
-
-    setSelectedLanguages([...selectedLanguages]);
+    setSelectedLanguages(selectedLanguages.map((language, idx) => (
+      idx === currentLanguageIdx
+        ? { ...language, customCodeEnabled: e.currentTarget.checked }
+        : language
+    )));
   };
 
   const handleCustomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    selectedLanguages[currentLanguageIdx].customCode = e.currentTarget.value;
-
-    setSelectedLanguages([...selectedLanguages]);
+    setSelectedLanguages(selectedLanguages.map((language, idx) => (
+      idx === currentLanguageIdx
+        ? { ...language, customCode: e.currentTarget.value }
+        : language
+    )));
   };
 
   const handleCustomLabelSwitcherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,21 +95,27 @@ export default function AddProjectLanguage({
       return;
     }
 
-    selectedLanguages[currentLanguageIdx].customLabelEnabled = e.currentTarget.checked;
-
-    setSelectedLanguages([...selectedLanguages]);
+    setSelectedLanguages(selectedLanguages.map((language, idx) => (
+      idx === currentLanguageIdx
+        ? { ...language, customLabelEnabled: e.currentTarget.checked }
+        : language
+    )));
   };
 
   const handleCustomLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    selectedLanguages[currentLanguageIdx].customLabel = e.currentTarget.value;
-
-    setSelectedLanguages([...selectedLanguages]);
+    setSelectedLanguages(selectedLanguages.map((language, idx) => (
+      idx === currentLanguageIdx
+        ? { ...language, customLabel: e.currentTarget.value }
+        : language
+    )));
   };
 
   const handleBaseLanguageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    selectedLanguages[currentLanguageIdx].baseLanguage = e.currentTarget.checked;
-
-    setSelectedLanguages([...selectedLanguages]);
+    setSelectedLanguages(selectedLanguages.map((language, idx) => (
+      idx === currentLanguageIdx
+        ? { ...language, baseLanguage: e.currentTarget.checked }
+        : language
+    )));
   };
 
   const handleCancelButtonClick = () => {

@@ -198,12 +198,13 @@ export default function ResetPassword() {
           <div className="formMk1-row">
             <div className="formControl">
               <div className="formControl-header">
-                <label className="formControl-label">New Password</label>
+                <label className="formControl-label" htmlFor="reset-new-password">New Password</label>
               </div>
               <div className="formControl-body">
                 <div className="formControl-wrapper">
                   <input
                     type="password"
+                    id="reset-new-password"
                     placeholder="New Password please"
                     name="password"
                     className="input formControl-input"
@@ -212,9 +213,6 @@ export default function ResetPassword() {
                 </div>
               </div>
               <div className="formControl-footer">
-                {false && (
-                  <div className="formControl-error">Error</div>
-                )}
               </div>
             </div>
 
@@ -223,12 +221,13 @@ export default function ResetPassword() {
           <div className="formMk1-row">
             <div className="formControl">
               <div className="formControl-header">
-                <label className="formControl-label">Confirm Password</label>
+                <label className="formControl-label" htmlFor="reset-confirm-password">Confirm Password</label>
               </div>
               <div className="formControl-body">
                 <div className="formControl-wrapper">
                   <input
                     type="password"
+                    id="reset-confirm-password"
                     placeholder="Confirm Your New Password please"
                     name="confirm_password"
                     className="input formControl-input"
@@ -237,9 +236,6 @@ export default function ResetPassword() {
                 </div>
               </div>
               <div className="formControl-footer">
-                {false && (
-                  <div className="formControl-error">Error</div>
-                )}
               </div>
             </div>
           </div>

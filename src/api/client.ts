@@ -6,7 +6,9 @@ import { IApiResponse, isApiError } from './errors';
 const { API_URL } = getAppConfig();
 
 function genRequestId(): string {
-  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
 
   const g = globalThis.crypto?.getRandomValues?.bind(globalThis.crypto);
   if (g) {
@@ -17,7 +19,6 @@ function genRequestId(): string {
     // eslint-disable-next-line no-bitwise
     b[8] = (b[8] & 0x3f) | 0x80;
 
-    // @ts-ignore
     const hex = [...b].map((n) => n.toString(16).padStart(2, '0'));
     return `${hex.slice(0, 4).join('')}-${hex.slice(4, 6).join('')}-${hex.slice(6, 8).join('')}-${hex.slice(8, 10).join('')}-${hex.slice(10, 16).join('')}`;
   }

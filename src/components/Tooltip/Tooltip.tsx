@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+} from 'react';
 import './Tooltip.scss';
 
 interface IProps {
@@ -25,7 +30,7 @@ export default function Tooltip({
   const currentTargetDataRef = useRef(null);
   currentTargetDataRef.current = currentTargetData;
 
-  const setTooltipPosition = () => {
+  const setTooltipPosition = useCallback(() => {
     const targetData = currentTargetDataRef.current;
 
     if (!tooltipRef.current) {
@@ -44,9 +49,9 @@ export default function Tooltip({
 
     setTop(anchorTop - tooltipHeight);
     setLeft(anchorLeft + (anchorWidth / 2) - (tooltipWidth / 2));
-  };
+  }, []);
 
-  const show = (e: Event) => {
+  const show = useCallback((e: Event) => {
     setIsVisible(true);
 
     const { target: $target } = e as Event & { target: HTMLElement };
@@ -62,21 +67,21 @@ export default function Tooltip({
     setTimeout(() => {
       setCssVisibility(true);
     }, 0);
-  };
+  }, [setTooltipPosition]);
 
-  const hide = () => {
+  const hide = useCallback(() => {
     setCssVisibility(false);
     setIsVisible(false);
-  };
+  }, []);
 
-  const hideGradually = () => {
+  const hideGradually = useCallback(() => {
     setCssVisibility(false);
     currentTargetDataRef.current = null;
 
     setIsVisible(false);
-  };
+  }, []);
 
-  const attachHoverListener = () => {
+  const attachHoverListener = useCallback(() => {
     const $anchors = document.querySelectorAll(anchor);
 
     if ($anchors.length < 1) {
@@ -89,9 +94,9 @@ export default function Tooltip({
     });
 
     window.addEventListener('scroll', hide);
-  };
+  }, [anchor, hide, hideGradually, show]);
 
-  const detachHoverListener = () => {
+  const detachHoverListener = useCallback(() => {
     const $anchors = document.querySelectorAll(anchor);
 
     if ($anchors.length < 1) {
@@ -104,7 +109,7 @@ export default function Tooltip({
     });
 
     window.removeEventListener('scroll', hide);
-  };
+  }, [anchor, hide, hideGradually, show]);
 
   useEffect(() => {
     attachHoverListener();
@@ -112,11 +117,11 @@ export default function Tooltip({
     return () => {
       detachHoverListener();
     };
-  }, []);
+  }, [attachHoverListener, detachHoverListener]);
 
   useEffect(() => {
     setTooltipPosition();
-  }, [isVisible]);
+  }, [isVisible, setTooltipPosition]);
 
   if (!isVisible) {
     return null;

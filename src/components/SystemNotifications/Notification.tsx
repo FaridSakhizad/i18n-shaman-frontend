@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { AppDispatch } from 'store';
 import { useDispatch } from 'react-redux';
 
@@ -32,13 +32,13 @@ export default function Notification(props: INotification) {
 
   const notificationRef = useRef<HTMLDivElement>(null);
 
-  const applyHeight = () => {
+  const applyHeight = useCallback(() => {
     if (!notificationRef || !notificationRef.current || duration === 'infinity') {
       return;
     }
 
     notificationRef.current.style.setProperty('--initial-height', `${notificationRef.current.getBoundingClientRect().height}px`);
-  };
+  }, [duration]);
 
   useEffect(() => {
     applyHeight();
@@ -49,9 +49,9 @@ export default function Notification(props: INotification) {
         clearTimeout(timer);
       }, duration);
     }
-  }, []);
+  }, [applyHeight, dispatch, duration, id]);
 
-  const style: React.CSSProperties & { '--duration': string } | {} = duration !== 'infinity' ? {
+  const style: React.CSSProperties & Partial<Record<'--duration', string>> = duration !== 'infinity' ? {
     '--duration': `${duration}ms`,
   } : {};
 

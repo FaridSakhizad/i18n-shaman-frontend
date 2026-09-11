@@ -73,13 +73,13 @@ export default function ImportLocales(props: IProps) {
       const assumedLanguage = name.split('.')[0];
       const format = type.split('/')[1];
 
-      const languageData = languagesMap[assumedLanguage] || {};
+      const languageData = languagesMap[assumedLanguage];
 
       newFilesList.push({
         name,
         format,
-        language: languageData.label,
-        code: languageData.code,
+        language: languageData?.label || assumedLanguage,
+        code: languageData?.code || assumedLanguage,
       });
     }
 

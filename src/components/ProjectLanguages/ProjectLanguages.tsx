@@ -1,4 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch } from 'react-redux';
 
 import { createSystemNotification, EMessageType } from 'store/systemNotifications';
@@ -49,7 +54,7 @@ export default function ProjectLanguages({
   const [projectLanguages, setProjectLanguages] = useState(project.languages);
   const [languageData, setLanguageData] = useState<ILanguage[] | undefined>();
 
-  const getAvailableLanguages = (languages: IProjectLanguage[], allLanguages: ILanguage[] | undefined) => {
+  const getAvailableLanguages = useCallback((languages: IProjectLanguage[], allLanguages: ILanguage[] | undefined) => {
     const languagesMap:IUserLanguagesMapItem = {};
 
     languages.forEach((language: IProjectLanguage) => {
@@ -61,13 +66,13 @@ export default function ProjectLanguages({
     }
 
     return allLanguages.filter(({ code }: ILanguage) => languagesMap[code] === undefined);
-  };
+  }, []);
 
   const [availableLanguagesList, setAvailableLanguagesList] = useState<ILanguage[]>();
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchLanguagesData = async () => {
+  const fetchLanguagesData = useCallback(async () => {
     setLoading(true);
 
     const result = await getAppLanguagesData();
@@ -88,11 +93,11 @@ export default function ProjectLanguages({
     setAvailableLanguagesList(availableLanguages);
 
     setLoading(false);
-  };
+  }, [dispatch, getAvailableLanguages, project.languages]);
 
   useEffect(() => {
     fetchLanguagesData();
-  }, []);
+  }, [fetchLanguagesData]);
 
   const toggleAllVisibilityClick = async (allVisible: boolean) => {
     setLoading(true);

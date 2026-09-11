@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+} from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -31,7 +36,7 @@ import {
 import { getApiErrorMessage, isApiError } from 'api/errors';
 
 import Header from 'components/Header';
-import { EHeaderModes } from 'components/Header/Header';
+import { EHeaderModes } from 'components/Header/constants';
 import ProjectLanguages from 'components/ProjectLanguages';
 import AddProjectLanguage from 'components/AddProjectLanguage';
 import CreateEntity from 'components/CreateEntity';
@@ -178,7 +183,7 @@ export default function Editor() {
 
   const [isAddLanguageModalVisible, setAddLanguageModalVisible] = useState<boolean>(false);
 
-  const fetchProjectData = async () => {
+  const fetchProjectData = useCallback(async () => {
     setLoading(true);
 
     const result = await getUserProjectById({
@@ -189,7 +194,7 @@ export default function Editor() {
       ...sorting,
       filters,
       tags,
-      search: searchQuery,
+      search: searchQueryRequest,
       searchParams,
     });
 
@@ -203,13 +208,24 @@ export default function Editor() {
     }
 
     setLoading(false);
-  };
+  }, [
+    currentProjectId,
+    dispatch,
+    filters,
+    itemsPerPage,
+    page,
+    searchParams,
+    searchQueryRequest,
+    sorting,
+    subFolderId,
+    tags,
+  ]);
 
   useEffect(() => {
     dispatch(getProjects());
 
     fetchProjectData();
-  }, [currentProjectId, subFolderId, page, sorting, filters, tags, searchParams, searchQueryRequest]);
+  }, [dispatch, fetchProjectData]);
 
   const handleAddLanguageClick = async () => {
     setAddLanguageModalVisible(true);

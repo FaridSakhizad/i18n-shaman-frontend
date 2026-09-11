@@ -33,7 +33,7 @@ interface IProps {
   path: string;
   pathCache: string;
   iteration?: number;
-  navigationData?: INavigationData | {};
+  navigationData?: Partial<INavigationData>;
   tags: IKeyTag[];
   projectTags: ITag[];
 }

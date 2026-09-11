@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 import './Modal.scss';
@@ -24,11 +24,11 @@ export default function Modal({ children, customClassNames, onEscapeKeyPress = (
     setDomReady(true);
   }, []);
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.code === 'Escape') {
       onEscapeKeyPress(e);
     }
-  };
+  }, [onEscapeKeyPress]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -36,7 +36,7 @@ export default function Modal({ children, customClassNames, onEscapeKeyPress = (
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]);
 
   const $portalEl = document.getElementById('modal-portal') as Element;
 

@@ -1,5 +1,5 @@
 const getRequiredConfigValue = (name: string): string => {
-  const value = process.env[name];
+  const value = import.meta.env[name];
 
   if (!value) {
     throw new Error(`${name} is required.`);
@@ -9,7 +9,7 @@ const getRequiredConfigValue = (name: string): string => {
 };
 
 const getAppConfig = () => ({
-  API_URL: getRequiredConfigValue('REACT_APP_API_URL'),
+  API_URL: getRequiredConfigValue('VITE_API_URL'),
 });
 
 export default getAppConfig;

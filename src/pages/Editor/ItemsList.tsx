@@ -29,7 +29,7 @@ interface IProps {
   page?: number;
   totalCount?: number;
   itemsPerPage?: number;
-  navigationData?: INavigationData | {};
+  navigationData?: Partial<INavigationData>;
   projectTags: ITag[]
 }
 
