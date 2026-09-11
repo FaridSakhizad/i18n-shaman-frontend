@@ -727,15 +727,16 @@ export default function Editor() {
       return null;
     }
 
-    if (!preferences.projectsOrder) {
+    if (!preferences.projectsOrder || !preferences.projectsOrder.length) {
       return projects;
     }
 
     const projectsMap: Map<string, IProject> = new Map<string, IProject>(projects.map((projectData) => [projectData.projectId, projectData]));
 
-    const orderedProjectIds = new Set(preferences.projectsOrder);
+    const cleanProjectsOrder = preferences.projectsOrder.filter((projectId) => typeof projectId === 'string' && projectId.length > 0);
+    const orderedProjectIds = new Set(cleanProjectsOrder);
 
-    const orderedProjectsData = preferences.projectsOrder
+    const orderedProjectsData = cleanProjectsOrder
       .map((id) => projectsMap.get(id))
       .filter((projectData): projectData is IProject => Boolean(projectData));
 

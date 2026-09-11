@@ -170,6 +170,32 @@ export default function Projects() {
 
   const [projectsOrder, setProjectsOrder] = useState<string[]>(preferences.projectsOrder);
 
+  const getSanitizedProjectsOrder = () => {
+    if (!projects) {
+      return [];
+    }
+
+    const existingProjectIds = new Set(projects.map((project) => project.projectId));
+
+    return (projectsOrder || []).filter((projectId) => (
+      typeof projectId === 'string' && existingProjectIds.has(projectId)
+    ));
+  };
+
+  const getRenderableProjectsOrder = () => {
+    if (!projects) {
+      return [];
+    }
+
+    const sanitizedProjectsOrder = getSanitizedProjectsOrder();
+    const orderedProjectIds = new Set(sanitizedProjectsOrder);
+    const unorderedProjectIds = projects
+      .map((project) => project.projectId)
+      .filter((projectId) => !orderedProjectIds.has(projectId));
+
+    return [...sanitizedProjectsOrder, ...unorderedProjectIds];
+  };
+
   const handleDragEnd = async (event: any) => {
     const { active, over } = event;
 
@@ -177,10 +203,16 @@ export default function Projects() {
       return;
     }
 
-    const oldIndex = projectsOrder.indexOf(active.id);
-    const newIndex = projectsOrder.indexOf(over.id);
+    const renderableProjectsOrder = getRenderableProjectsOrder();
 
-    const newOrder = arrayMove(projectsOrder, oldIndex, newIndex);
+    const oldIndex = renderableProjectsOrder.indexOf(active.id);
+    const newIndex = renderableProjectsOrder.indexOf(over.id);
+
+    if (oldIndex < 0 || newIndex < 0) {
+      return;
+    }
+
+    const newOrder = arrayMove(renderableProjectsOrder, oldIndex, newIndex);
 
     setProjectsOrder(newOrder);
 
@@ -192,14 +224,15 @@ export default function Projects() {
       return null;
     }
 
-    if (!projectsOrder) {
+    if (!projectsOrder || !projectsOrder.length) {
       return projects;
     }
 
+    const renderableProjectsOrder = getRenderableProjectsOrder();
     const projectsMap: Map<string, IProject> = new Map<string, IProject>(projects.map((project) => [project.projectId, project]));
-    const orderedProjectIds = new Set(projectsOrder);
+    const orderedProjectIds = new Set(renderableProjectsOrder);
 
-    const orderedProjectsData = projectsOrder
+    const orderedProjectsData = renderableProjectsOrder
       .map((id) => projectsMap.get(id))
       .filter((project): project is IProject => Boolean(project));
 
@@ -244,7 +277,7 @@ export default function Projects() {
             modifiers={[restrictToParentElement]}
           >
             <SortableContext
-              items={projectsOrder || []}
+              items={(orderedProjects || []).map((project) => project.projectId)}
               strategy={verticalListSortingStrategy}
             >
               {orderedProjects && orderedProjects.map((project: IProject) => (
