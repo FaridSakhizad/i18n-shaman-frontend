@@ -10,10 +10,13 @@ import './assets/styles/common.scss';
 
 import appstore from './store';
 import router from './router';
+import { trackEvent } from './api/tracking';
 
 import './i18n';
 
 import MainLayout from './MainLayout';
+
+void trackEvent('app_opened');
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,

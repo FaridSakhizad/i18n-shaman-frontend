@@ -9,6 +9,7 @@ import { createSystemNotification, EMessageType } from 'store/systemNotification
 
 import './ExportProject.scss';
 import clsx from 'clsx';
+import { trackEvent } from 'api/tracking';
 
 interface IProps {
   project: IProject | null;
@@ -72,8 +73,18 @@ export default function ExportProject(props: IProps) {
 
       window.URL.revokeObjectURL(url);
 
+      void trackEvent('export_completed', {
+        project_id: projectId,
+        format: exportFormat,
+      });
+
       onConfirm();
     } catch {
+      void trackEvent('export_failed', {
+        project_id: projectId,
+        format: exportFormat,
+      });
+
       dispatch(createSystemNotification({
         content: 'Error Exporting Project',
         type: EMessageType.Error,

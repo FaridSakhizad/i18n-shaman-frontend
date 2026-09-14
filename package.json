@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "node ./node_modules/@typescript/native/bin/tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tracking:dev": "wrangler dev --config workers/tracking/wrangler.jsonc",
+    "tracking:deploy": "wrangler deploy --config workers/tracking/wrangler.jsonc",
+    "tracking:tail": "wrangler tail --config workers/tracking/wrangler.jsonc"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -42,6 +45,7 @@
     "globals": "^17.12.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "typescript-eslint": "^8.69.0",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "wrangler": "^4.131.1"
   }
 }

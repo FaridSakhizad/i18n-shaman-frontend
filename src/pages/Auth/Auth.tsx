@@ -11,6 +11,7 @@ import {
   registerUser,
   resetPasswordRequest,
 } from 'api/user';
+import { trackEvent } from 'api/tracking';
 import { getApiErrorMessage, getApiErrorStatus, isApiError } from 'api/errors';
 import { restoreSession } from 'store/user';
 
@@ -191,6 +192,10 @@ export default function Auth() {
     } else {
       const restoredSession = await dispatch(restoreSession()).unwrap();
 
+      void trackEvent('login_completed', {
+        verified: restoredSession.verified,
+      });
+
       navigate(restoredSession.verified ? '/projects' : '/verify-email-required');
     }
   };
@@ -261,6 +266,8 @@ export default function Auth() {
 
       setSingUpGeneralError(getApiErrorMessage(result, API_SIGNUP_ERROR_MESSAGES[errorCode]));
     } else {
+      void trackEvent('signup_completed');
+
       setSingUpSuccess(true);
     }
 

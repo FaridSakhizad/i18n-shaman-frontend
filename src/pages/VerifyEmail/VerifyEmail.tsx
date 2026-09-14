@@ -8,6 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getEmailVerificationSecurityToken, verifyEmail } from 'api/user';
 import { isApiError } from 'api/errors';
+import { trackEvent } from 'api/tracking';
 
 import store, { IRootState } from 'store';
 import { restoreSession } from 'store/user';
@@ -45,6 +46,8 @@ export default function VerifyEmail() {
     if (userId) {
       await dispatch(restoreSession());
     }
+
+    void trackEvent('email_verified');
 
     setVerificationSuccess(true);
     setLoading(false);

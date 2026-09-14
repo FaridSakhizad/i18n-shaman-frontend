@@ -38,4 +38,3 @@ export async function trackEvent(event: TrackingEventName, properties?: Tracking
     // Tracking should never block the editor flow.
   }
 }
-

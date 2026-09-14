@@ -34,6 +34,7 @@ import {
   getUserProjectById,
 } from 'api/projects';
 import { getApiErrorMessage, isApiError } from 'api/errors';
+import { trackEvent } from 'api/tracking';
 
 import Header from 'components/Header';
 import { EHeaderModes } from 'components/Header/constants';
@@ -165,6 +166,8 @@ export default function Editor() {
   const searchParamsRef = useRef(searchParams);
   searchParamsRef.current = searchParams;
 
+  const trackedProjectOpenRef = useRef<string | null>(null);
+
   const { projects } = useSelector((state: IRootState) => state.projects);
 
   const [project, setProject] = useState<IProject | null>(null);
@@ -205,6 +208,16 @@ export default function Editor() {
       }));
     } else {
       setProject(result);
+
+      if (trackedProjectOpenRef.current !== currentProjectId) {
+        void trackEvent('project_opened', {
+          project_id: currentProjectId,
+          language_count: result.languages?.length || 0,
+          key_count: result.keysTotalCount || result.keys?.length || 0,
+        });
+
+        trackedProjectOpenRef.current = currentProjectId;
+      }
     }
 
     setLoading(false);
@@ -630,6 +643,14 @@ export default function Editor() {
       window.history.pushState({}, '', url);
 
       setSearchQueryRequest(searchQueryData);
+
+      if (searchQueryData && searchQueryData.length > 0) {
+        void trackEvent('search_used', {
+          project_id: currentProjectId,
+          query_length: searchQueryData.length,
+          enabled_search_params_count: Object.values(searchParamsData).filter(Boolean).length,
+        });
+      }
 
       setSearchTimeoutId(null);
     }, 1000);

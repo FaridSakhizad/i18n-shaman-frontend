@@ -17,6 +17,7 @@ import './ImportComponents.scss';
 import { importComponentsToProject } from '../../api/projects';
 import { createSystemNotification, EMessageType } from '../../store/systemNotifications';
 import QuickLanguageAdd from '../QuickLanguageAdd';
+import { trackEvent } from '../../api/tracking';
 
 interface IProps {
   project: IProject | null;
@@ -126,6 +127,12 @@ export default function ImportComponents(props: IProps) {
     const result: { success: boolean } | IError = await importComponentsToProject(formDataInState);
 
     if (isApiError(result)) {
+      void trackEvent('import_failed', {
+        project_id: project.projectId,
+        import_type: 'components',
+        file_count: filesList.length,
+      });
+
       dispatch(createSystemNotification({
         content: getApiErrorMessage(result, 'Error Importing Components'),
         type: EMessageType.Error,
@@ -141,11 +148,23 @@ export default function ImportComponents(props: IProps) {
         type: EMessageType.Success,
       }));
 
+      void trackEvent('import_completed', {
+        project_id: project.projectId,
+        import_type: 'components',
+        file_count: filesList.length,
+      });
+
       setLoading(false);
       onConfirm();
 
       return;
     }
+
+    void trackEvent('import_failed', {
+      project_id: project.projectId,
+      import_type: 'components',
+      file_count: filesList.length,
+    });
 
     dispatch(createSystemNotification({
       content: 'Error Importing Components',

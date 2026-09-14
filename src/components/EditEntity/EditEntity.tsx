@@ -14,6 +14,7 @@ import { validateKeyName } from 'utils/validators';
 import { getKeyData, updateKey } from 'api/projects';
 import { getApiErrorMessage, isApiError } from 'api/errors';
 import { createSystemNotification, EMessageType } from 'store/systemNotifications';
+import { trackEvent } from 'api/tracking';
 
 import './EditEntity.scss';
 
@@ -103,6 +104,13 @@ export default function EditEntity({
   };
 
   const handleSelectedLanguageChange = ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
+    if (value !== selectedLanguageId) {
+      void trackEvent('language_switched', {
+        project_id: project.projectId,
+        surface: 'edit_entity',
+      });
+    }
+
     setSelectedLanguageId(value);
   };
 
@@ -169,6 +177,14 @@ export default function EditEntity({
     }
 
     setLoading(false);
+
+    if (entityType === EntityType.String) {
+      void trackEvent('translation_updated', {
+        project_id: project.projectId,
+        language_count: project.languages?.length || 0,
+        values_count: keyValuesPrepared.length,
+      });
+    }
 
     onSave();
   };

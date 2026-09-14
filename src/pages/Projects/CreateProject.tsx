@@ -5,6 +5,7 @@ import { createProject } from '../../store/projects';
 import { AppDispatch } from '../../store';
 import { createSystemNotification, EMessageType } from '../../store/systemNotifications';
 import { getApiErrorMessage } from '../../api/errors';
+import { trackEvent } from '../../api/tracking';
 
 interface IProps {
   onClose: () => void;
@@ -46,6 +47,8 @@ export default function CreateProject({
       await dispatch(createProject({
         newProjectName: projectName,
       })).unwrap();
+
+      void trackEvent('project_created');
 
       onClose();
     } catch (error) {

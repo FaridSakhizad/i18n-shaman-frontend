@@ -10,6 +10,7 @@ import AddLanguageControl from '../AddProjectLanguage/AddLanguageControl';
 import { importDataToProject } from '../../api/projects';
 import { createSystemNotification, EMessageType } from '../../store/systemNotifications';
 import { getApiErrorMessage, isApiError } from '../../api/errors';
+import { trackEvent } from '../../api/tracking';
 
 interface IProps {
   projectId: string;
@@ -142,6 +143,12 @@ export default function ImportLocales(props: IProps) {
     setLoading(false);
 
     if (isApiError(result)) {
+      void trackEvent('import_failed', {
+        project_id: projectId,
+        import_type: 'locales',
+        file_count: filesList.length,
+      });
+
       dispatch(createSystemNotification({
         content: getApiErrorMessage(result, 'Error Importing Language Files'),
         type: EMessageType.Error,
@@ -154,6 +161,12 @@ export default function ImportLocales(props: IProps) {
       content: 'Language files imported successfully',
       type: EMessageType.Success,
     }));
+
+    void trackEvent('import_completed', {
+      project_id: projectId,
+      import_type: 'locales',
+      file_count: filesList.length,
+    });
 
     onConfirm();
   };

@@ -14,6 +14,7 @@ import {
 import { validateKeyName } from 'utils/validators';
 import { createSystemNotification, EMessageType } from 'store/systemNotifications';
 import { getApiErrorMessage, isApiError } from 'api/errors';
+import { trackEvent } from 'api/tracking';
 
 import './CreateEntity.scss';
 
@@ -98,6 +99,13 @@ export default function CreateEntity({
   };
 
   const handleTargetLanguageClick = (id: string) => {
+    if (id !== selectedLanguageId) {
+      void trackEvent('language_switched', {
+        project_id: projectId,
+        surface: 'create_entity',
+      });
+    }
+
     setSelectedLanguageId(id);
   };
 
@@ -182,6 +190,13 @@ export default function CreateEntity({
     }
 
     setLoading(false);
+
+    void trackEvent('key_created', {
+      project_id: projectId,
+      entity_type: entityType,
+      has_initial_value: Object.values(keyValues).some((value) => value.length > 0),
+      language_count: project.languages?.length || 0,
+    });
 
     onConfirm();
   };

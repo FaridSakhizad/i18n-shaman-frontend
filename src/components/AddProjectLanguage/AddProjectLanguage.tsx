@@ -9,6 +9,7 @@ import { ILanguage, IProjectLanguage, IUserLanguagesMapItem } from 'interfaces';
 import { addMultipleLanguages, getAppLanguagesData } from 'api/languages';
 import { getUserProjectById } from 'api/projects';
 import { getApiErrorMessage, isApiError } from 'api/errors';
+import { trackEvent } from 'api/tracking';
 
 import AddLanguageControl from './AddLanguageControl';
 
@@ -160,6 +161,11 @@ export default function AddProjectLanguage({
         content: 'Language Added Successfully',
         type: EMessageType.Success,
       }));
+
+      void trackEvent('language_added', {
+        project_id: projectId,
+        language_count: selectedLanguages.length,
+      });
 
       onConfirm();
     }
