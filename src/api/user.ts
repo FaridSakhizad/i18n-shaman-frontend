@@ -1,11 +1,5 @@
 import { apiClient, requestEnvelope, requestPayload } from './client';
-import { IUserPreferences } from '../interfaces/user';
-
-interface IPublicUserData {
-  id: string;
-  email: string;
-  preferences?: IUserPreferences;
-}
+import { IPublicUserData } from '../interfaces/user';
 
 interface ITokenResponse {
   token: string;
@@ -40,6 +34,8 @@ export const loginUser = async ({ email, password }: ILoginUserDto) => requestPa
 export const verifyUser = async () => requestPayload<IPublicUserData>(apiClient.get('auth/verifyUser'));
 
 export const logout = async () => requestPayload<IMessageResponse>(apiClient.post('auth/logout'));
+
+export const resendVerificationEmail = async () => requestPayload<IMessageResponse>(apiClient.post('auth/resendVerificationEmail'));
 
 export const resetPasswordRequest = async (email: string) => requestPayload<IMessageResponse>(apiClient.post('auth/resetPasswordRequest', { email }));
 

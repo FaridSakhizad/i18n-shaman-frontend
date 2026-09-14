@@ -1,12 +1,26 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { getEmailVerificationSecurityToken, verifyEmail } from 'api/user';
 import { isApiError } from 'api/errors';
+
+import store, { IRootState } from 'store';
+import { restoreSession } from 'store/user';
 
 import './VerifyEmail.css';
 
 export default function VerifyEmail() {
   const { verificationToken = '' } = useParams<{ verificationToken: string }>();
+
+  const dispatch = useDispatch<typeof store.dispatch>();
+
+  const { id: userId } = useSelector(({ user }: IRootState) => user);
+  const handledVerificationTokenRef = useRef<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
@@ -28,9 +42,13 @@ export default function VerifyEmail() {
       return;
     }
 
+    if (userId) {
+      await dispatch(restoreSession());
+    }
+
     setVerificationSuccess(true);
     setLoading(false);
-  }, [verificationToken]);
+  }, [dispatch, userId, verificationToken]);
 
   useEffect(() => {
     if (!verificationToken || verificationToken.length < 1) {
@@ -39,6 +57,11 @@ export default function VerifyEmail() {
       return;
     }
 
+    if (handledVerificationTokenRef.current === verificationToken) {
+      return;
+    }
+
+    handledVerificationTokenRef.current = verificationToken;
     performVerification();
   }, [performVerification, verificationToken]);
 
@@ -66,7 +89,10 @@ export default function VerifyEmail() {
   return (
     <div className="verifyEmail">
       <h3 className="h2 verifyEmail-title">Your email verified successfully</h3>
-      <Link to="/auth" replace className="button primary verifyEmail-loginButton">Login to Site</Link>
+
+      <Link to={userId ? '/projects' : '/auth'} replace className="button primary verifyEmail-loginButton">
+        {userId ? 'Continue' : 'Login to Site'}
+      </Link>
     </div>
   );
 }

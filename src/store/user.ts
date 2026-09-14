@@ -7,6 +7,7 @@ import { createAppSlice } from './helpers';
 interface IInitialState {
   id: string | null;
   email: string | null;
+  verified: boolean;
   loading: boolean;
   settings: IUserSettings;
   preferences: IUserPreferences;
@@ -15,6 +16,7 @@ interface IInitialState {
 const initialState: IInitialState = {
   id: null,
   email: null,
+  verified: false,
   loading: true,
   settings: {
     language: null,
@@ -67,11 +69,17 @@ const userSlice = createAppSlice({
           return;
         }
 
-        const { id, email, preferences } = action.payload;
+        const {
+          id,
+          email,
+          verified,
+          preferences,
+        } = action.payload;
 
         state.loading = false;
         state.id = id;
         state.email = email;
+        state.verified = verified;
         state.preferences = preferences || { projectsOrder: [] };
       })
       .addCase(restoreSession.rejected, (state) => {

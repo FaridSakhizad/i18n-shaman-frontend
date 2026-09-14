@@ -11,9 +11,11 @@ interface IProps {
 export default function GuestOnlyRoute(props: IProps) {
   const { component, redirectPath = '/' } = props;
 
-  const { id: userId } = useSelector(({ user }: IRootState) => user);
+  const { id: userId, verified } = useSelector(({ user }: IRootState) => user);
 
-  return (
-    userId ? <Navigate to={redirectPath as string} /> : component
-  );
+  if (!userId) {
+    return component;
+  }
+
+  return <Navigate to={(verified ? redirectPath : '/verify-email-required') as string} />;
 }

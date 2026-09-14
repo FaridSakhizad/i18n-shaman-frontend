@@ -12,6 +12,7 @@ import resetPasswordLoader from './pages/ResetPassword/loader';
 const Auth = lazy(() => import('./pages/Auth'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const VerifyEmailRequired = lazy(() => import('./pages/VerifyEmailRequired'));
 const Projects = lazy(() => import('./pages/Projects'));
 const Editor = lazy(() => import('./pages/Editor'));
 const Profile = lazy(() => import('./pages/Profile'));
@@ -39,7 +40,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/verify-email/:verificationToken?',
-    element: <GuestOnlyRoute redirectPath="/" component={withPageFallback(<VerifyEmail />)} />,
+    element: withPageFallback(<VerifyEmail />),
+  },
+  {
+    path: '/verify-email-required',
+    element: <PrivateRoute requireVerified={false} component={withPageFallback(<VerifyEmailRequired />)} />,
   },
   {
     path: '/projects',

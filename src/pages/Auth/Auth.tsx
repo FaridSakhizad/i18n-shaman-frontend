@@ -189,8 +189,9 @@ export default function Auth() {
       setLoginGeneralError(getApiErrorMessage(result, API_LOGIN_ERROR_MESSAGES[errorCode]));
       setLoading(false);
     } else {
-      dispatch(restoreSession());
-      navigate('/projects');
+      const restoredSession = await dispatch(restoreSession()).unwrap();
+
+      navigate(restoredSession.verified ? '/projects' : '/verify-email-required');
     }
   };
 

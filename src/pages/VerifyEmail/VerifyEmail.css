@@ -15,6 +15,16 @@ body:has(.verifyEmail) {
     margin-bottom: 18px;
 }
 
+.verifyEmail-text,
+.verifyEmail-message,
+.verifyEmail-error {
+    margin-bottom: 18px;
+}
+
+.verifyEmail-error {
+    color: #c93434;
+}
+
 .verifyEmail-buttons {
     display: flex;
     gap: 24px;

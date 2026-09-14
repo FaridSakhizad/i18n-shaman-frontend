@@ -6,14 +6,21 @@ import { IRootState } from 'store';
 interface IProps {
   component: ReactElement,
   redirectPath?: string,
+  requireVerified?: boolean,
 }
 
 export default function PrivateRoute(props: IProps) {
-  const { component, redirectPath = '/' } = props;
+  const { component, redirectPath = '/', requireVerified = true } = props;
 
-  const { id: userId } = useSelector(({ user }: IRootState) => user);
+  const { id: userId, verified } = useSelector(({ user }: IRootState) => user);
 
-  return (
-    !userId ? <Navigate to={redirectPath as string} /> : component
-  );
+  if (!userId) {
+    return <Navigate to={redirectPath as string} />;
+  }
+
+  if (requireVerified && !verified) {
+    return <Navigate to="/verify-email-required" />;
+  }
+
+  return component;
 }
